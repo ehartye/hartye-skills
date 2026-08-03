@@ -105,11 +105,13 @@ An empty `statusCheckRollup` means no checks ran — treat it as absent CI, not 
   let silence imply the change was validated.
 
 ```bash
-gh pr merge --squash --delete-branch
+gh pr merge --squash                    # NOT --delete-branch; it deletes the local branch too
+git push origin --delete <branch>       # remote only
 ```
 
-Squash keeps the default branch linear, one commit per PR. `--delete-branch` clears the remote only
-— the local branch stays, holding the granular commits. Merge conflict → **stop**, hand back.
+Squash keeps the default branch linear, one commit per PR. Delete the remote branch so
+`git branch -r` stops reporting squash-merged work as unmerged; keep the local one, which is where
+the granular commits remain reachable. Merge conflict → **stop**, hand back.
 
 ### 8. Sync
 
@@ -132,4 +134,5 @@ Noticing any of these means the pipeline has drifted into doing harm. Stop and r
 | Merging red, or merging without saying no CI ran | Report the state, then let the user decide |
 | Hardcoding `main` | Resolve `origin/HEAD`; `master` is still out there |
 | Amending or rebasing pushed commits | Push a new commit; pushed history is shared |
+| `gh pr merge -d` to clear the remote | It deletes the local branch too — push a delete instead |
 | Reporting "shipped" after a stop | Name the step reached and what is left |

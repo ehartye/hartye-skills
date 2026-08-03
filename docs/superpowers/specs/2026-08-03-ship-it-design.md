@@ -22,7 +22,7 @@ Each step is a no-op when already satisfied, so the skill is safe to run at any 
 5. **PR** — `gh pr create --fill`. Existing open PR: the push already updated it.
 6. **Review** — print URL, diffstat, check status; offer browser / merge / stop.
 7. **Merge** — CI present: wait, refuse on red. CI absent: say so explicitly, then confirm.
-   `gh pr merge --squash --delete-branch`.
+   `gh pr merge --squash`, then `git push origin --delete <branch>`.
 8. **Sync** — `git switch <default> && git pull --ff-only`.
 
 ## Decisions
@@ -49,6 +49,9 @@ also keep every merged branch — and because squash-merge rewrites parentage, g
 them as unmerged forever. Deleting the remote branch clears that; keeping the local branch retains
 the granular commits where someone would actually look for them. The GitHub PR page holds them
 permanently regardless.
+
+Note `gh pr merge --delete-branch` is **not** the way to do this: it deletes the local branch as
+well as the remote. The remote delete has to be a separate `git push origin --delete`.
 
 ### Message style is detected, not imposed
 
