@@ -1,0 +1,21 @@
+{
+  "name": "hartye-skills-dev",
+  "description": "Local development marketplace for the hartye-skills plugin",
+  "owner": {
+    "name": "Eric Hartye",
+    "email": "eric@hartye.com"
+  },
+  "plugins": [
+    {
+      "name": "hartye-skills",
+      "description": "General-purpose utility skills for Claude Code - small, self-contained techniques that are useful across many projects",
+      "version": "0.1.0",
+      "source": "./",
+      "author": {
+        "name": "Eric Hartye",
+        "email": "eric@hartye.com"
+      },
+      "license": "MIT"
+    }
+  ]
+}

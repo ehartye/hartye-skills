@@ -1,0 +1,13 @@
+{
+  "name": "hartye-skills",
+  "description": "General-purpose utility skills for Claude Code - small, self-contained techniques that are useful across many projects",
+  "version": "0.1.0",
+  "author": {
+    "name": "Eric Hartye",
+    "email": "eric@hartye.com"
+  },
+  "homepage": "https://github.com/ehartye/hartye-skills",
+  "repository": "https://github.com/ehartye/hartye-skills",
+  "license": "MIT",
+  "keywords": ["skills", "utilities", "tools", "productivity", "general-purpose"]
+}
