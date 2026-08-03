@@ -36,13 +36,11 @@ For local development against this checkout:
 
 ## Skills
 
-_None yet — this is the initial scaffold._
-
 <!-- Keep this table in sync as skills are added. -->
 
 | Skill | Use when |
 | ----- | -------- |
-|       |          |
+| [ship-it](skills/ship-it/SKILL.md) | You want pending work committed, pushed, PR'd and squash-merged in one step — including when it's sitting on the default branch. Also `/ship-it [branch-name]`. |
 
 ## Layout
 
