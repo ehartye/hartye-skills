@@ -1,0 +1,60 @@
+The "beautiful" skill is a derivative work of Anthropic's "frontend-design" skill.
+
+  Original work: Copyright Anthropic, PBC
+  Licensed under the Apache License, Version 2.0 (see LICENSE.txt)
+  Source: https://github.com/anthropics/claude-plugins-public
+          plugins/frontend-design/skills/frontend-design/SKILL.md
+
+Modifications by Eric Hartye, 2026-08-04, also under Apache 2.0.
+
+This file records the changes required by section 4(b) of the License.
+
+## Source revisions
+
+Only two commits in the upstream repository have ever touched that SKILL.md, and the
+second replaced the first rather than extending it. Both are combined here.
+
+  4ca561fb8532594e7a5faef945e85096fcec0616  2025-11-20
+    "creating intital scaffolding for claude code plugins"
+    The original 562-word version. Framing: avoid generic "AI slop" aesthetics.
+
+  d029127f7d29bdb8fd8902ac34dd7d5c8ba92b6e  2026-06-14
+    "Update frontend-design skill (#2540)"
+    A 1332-word rewrite. Framing: design lead at a studio, working to a client brief.
+
+## Changes made
+
+Renamed to "beautiful". Frontmatter reduced to `name` and `description` (the upstream
+`license` key is dropped; licensing is recorded here and in LICENSE.txt instead), and the
+description rewritten as triggering conditions only.
+
+The hybrid takes the newer version's structure and voice as its spine, then restores the
+material the rewrite dropped:
+
+  - The tone menu of eleven named aesthetic directions, and the
+    Purpose / Tone / Constraints / Differentiation questions (from 4ca561f)
+  - Spatial composition — asymmetry, overlap, diagonal flow, grid-breaking (from 4ca561f;
+    absent from d029127)
+  - Backgrounds and visual detail — gradient meshes, noise, grain, layered transparency,
+    custom cursors (from 4ca561f; absent from d029127)
+  - Motion mechanics — CSS-only for plain HTML, the Motion library for React, staggered
+    reveals via animation-delay (from 4ca561f), merged with the newer version's argument
+    for using motion sparingly
+  - Named anti-patterns — Arial/Inter/Roboto/system stacks, purple gradients on white,
+    convergence on Space Grotesk (from 4ca561f), merged into the newer version's
+    three-cluster calibration section
+  - Explicit colour guidance and light/dark variation (from 4ca561f)
+  - The closing "don't hold back" exhortation (from 4ca561f)
+
+Retained in full from d029127: the studio framing, "ground it in the subject", hero-as-
+thesis, "structure is information", the three-cluster calibration, the two-pass token-system
+process with ASCII wireframes, the CSS specificity warning, the quality floor, the Chanel
+restraint rule, and the entire "Writing in design" section.
+
+One editorial reconciliation was necessary. The original urges committing to a BOLD
+direction and not holding back; the rewrite urges spending boldness in one place and
+removing one accessory before leaving the house. These are stated as a single position in
+the hybrid, using the original's own formulation — "intentionality, not intensity" — as the
+bridge: commit fully to a direction, then concentrate the boldness rather than spreading it.
+
+No other substantive guidance from either revision was omitted.
