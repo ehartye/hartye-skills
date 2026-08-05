@@ -40,6 +40,7 @@ For local development against this checkout:
 
 | Skill | Use when |
 | ----- | -------- |
+| [beautiful](skills/beautiful/SKILL.md) | Building or reshaping any user-facing interface, or a design reads as templated and AI-generated. Covers aesthetic direction, typography, palette, layout, motion, and interface copy. |
 | [ship-it](skills/ship-it/SKILL.md) | You want pending work committed, pushed, PR'd and squash-merged in one step — including when it's sitting on the default branch. Also `/ship-it [branch-name]`. |
 
 ## Layout
@@ -74,4 +75,13 @@ See `CLAUDE.md` for the full working agreement. The short version:
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE) — **except** where a skill directory carries its own license file,
+which takes precedence for that skill:
+
+| Skill | License | Why |
+| ----- | ------- | --- |
+| [beautiful](skills/beautiful/) | Apache 2.0 | Derived from Anthropic's `frontend-design` skill. See [NOTICE](skills/beautiful/NOTICE) for source commits and changes, [LICENSE.txt](skills/beautiful/LICENSE.txt) for terms. |
+
+Apache 2.0 is compatible with this repo, but it is not MIT: it obliges us to ship the license text,
+retain attribution, and state our changes. Any future skill derived from third-party work follows
+the same pattern — license file plus `NOTICE` in its own directory, and a row here.

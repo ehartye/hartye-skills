@@ -17,6 +17,13 @@ has outgrown this repo. Split it into its own repo and add a marketplace entry, 
 pattern of `agent-stalker` and `md-publisher`. Do not grow this plugin sideways into an
 application.
 
+## Derived skills
+
+A skill adapted from third-party work keeps that work's license, which overrides the repo's MIT.
+Put the license file and a `NOTICE` in the skill's own directory, state the changes made (Apache 2.0
+§4(b) requires it), and add a row to the license table in `README.md`. `skills/beautiful/` is the
+worked example.
+
 ## Authoring discipline
 
 **REQUIRED:** Use the `h-superpowers:writing-skills` skill before writing or editing any
@@ -35,8 +42,15 @@ the skill, record the failure verbatim, then write the minimum that fixes it.
 - **`description` says WHEN, never WHAT.** Start with "Use when…" and list concrete triggers,
   symptoms, and error strings. A description that summarizes the workflow becomes a shortcut the
   model takes *instead of* reading the skill body.
-- **Keep skills under ~500 words.** Push heavy reference material into a sibling file that the
-  skill links to, so it loads only on demand.
+- **Budget words by how the skill loads, not by a flat cap.** The ~500-word guidance in
+  `writing-skills` exists to protect context in skills that load into *every* conversation. Nothing
+  here does — these are model-invoked on demand, so the cost is paid only when the skill is
+  actually relevant. Be concise because concision is clearer, not to hit a number.
+  - A skill that is one procedure should read as one procedure; if it needs eight steps, write
+    eight steps.
+  - Push genuinely optional reference — API tables, exhaustive syntax — into a sibling file the
+    skill links to.
+  - If a skill is long because it covers two unrelated jobs, that's a split, not a trim.
 - **Cross-reference by name, never with `@`.** Write `**REQUIRED:** Use h-superpowers:brainstorming`.
   An `@path` force-loads the file and burns context immediately.
 - **No narrative.** "In session 2026-08-03 we discovered…" is not a skill. Skills are reusable
