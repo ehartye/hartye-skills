@@ -1,7 +1,7 @@
 {
   "name": "hartye-skills",
   "description": "General-purpose utility skills for Claude Code - small, self-contained techniques that are useful across many projects",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "Eric Hartye",
     "email": "eric@hartye.com"
