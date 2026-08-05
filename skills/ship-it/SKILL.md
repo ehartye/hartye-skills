@@ -104,14 +104,31 @@ An empty `statusCheckRollup` means no checks ran — treat it as absent CI, not 
 - **No checks** → say plainly: *"no CI configured; nothing has verified this."* Then confirm. Never
   let silence imply the change was validated.
 
+Read `mergeStateStatus` before attempting anything. `BLOCKED` means branch protection is refusing —
+usually a required approving review, which you cannot satisfy by approving your own PR. **Stop and
+report it.** `gh pr merge --admin` bypasses protection where `enforce_admins` is off, but that is
+the user's call to make, not a fallback to reach for.
+
 ```bash
-gh pr merge --squash                    # NOT --delete-branch; it deletes the local branch too
-git push origin --delete <branch>       # remote only
+gh pr view <n> --json mergeable,mergeStateStatus   # BLOCKED/DIRTY -> stop, do not proceed
+gh pr merge <n> --squash
+```
+
+**Verify the merge landed before touching any branch.** `gh pr merge` can fail — protection, a
+conflict, a race — and it exits without merging while the next command in a chain runs anyway.
+Deleting the branch of an unmerged PR *closes that PR* and removes the remote copy of the work:
+
+```bash
+test "$(gh pr view <n> --json state -q .state)" = MERGED || exit 1
+git push origin --delete <branch>       # remote only, and only once MERGED is confirmed
 ```
 
 Squash keeps the default branch linear, one commit per PR. Delete the remote branch so
 `git branch -r` stops reporting squash-merged work as unmerged; keep the local one, which is where
 the granular commits remain reachable. Merge conflict → **stop**, hand back.
+
+If a branch was deleted in error, the work is recoverable: the local branch still holds the commits,
+so `git push -u origin <branch>` followed by `gh pr reopen <n>` restores both.
 
 ### 8. Sync
 
@@ -135,4 +152,6 @@ Noticing any of these means the pipeline has drifted into doing harm. Stop and r
 | Hardcoding `main` | Resolve `origin/HEAD`; `master` is still out there |
 | Amending or rebasing pushed commits | Push a new commit; pushed history is shared |
 | `gh pr merge -d` to clear the remote | It deletes the local branch too — push a delete instead |
+| Deleting the branch without checking the PR merged | A failed merge plus a branch delete *closes* the PR — assert `state == MERGED` first |
+| Treating `BLOCKED` as something to work around | Protection is a decision someone made; report it and let the user choose `--admin` |
 | Reporting "shipped" after a stop | Name the step reached and what is left |
