@@ -104,13 +104,28 @@ An empty `statusCheckRollup` means no checks ran — treat it as absent CI, not 
 - **No checks** → say plainly: *"no CI configured; nothing has verified this."* Then confirm. Never
   let silence imply the change was validated.
 
-Read `mergeStateStatus` before attempting anything. `BLOCKED` means branch protection is refusing —
-usually a required approving review, which you cannot satisfy by approving your own PR. **Stop and
-report it.** `gh pr merge --admin` bypasses protection where `enforce_admins` is off, but that is
-the user's call to make, not a fallback to reach for.
+Read `mergeStateStatus` before attempting anything — but **poll for it**. GitHub computes
+mergeability asynchronously, so for the first few seconds after `gh pr create` it returns `UNKNOWN`.
+This pipeline always asks within those seconds. A single read gets `UNKNOWN`, reads it as "not
+blocked", and sails straight past the case this check exists to catch:
 
 ```bash
-gh pr view <n> --json mergeable,mergeStateStatus   # BLOCKED/DIRTY -> stop, do not proceed
+for i in $(seq 10); do
+  STATUS=$(gh pr view <n> --json mergeStateStatus -q .mergeStateStatus)
+  [ "$STATUS" != UNKNOWN ] && break
+  sleep 2
+done
+```
+
+`BLOCKED` means branch protection is refusing — usually a required approving review, which you
+cannot satisfy by approving your own PR. `DIRTY` means conflicts. **Stop and report either.**
+`gh pr merge --admin` bypasses protection where `enforce_admins` is off, but that is the user's call
+to make, not a fallback to reach for.
+
+If the status is still `UNKNOWN` after polling, say so rather than assuming it is fine — the merge
+below may still fail, and step 7b is what catches that.
+
+```bash
 gh pr merge <n> --squash
 ```
 
@@ -154,4 +169,5 @@ Noticing any of these means the pipeline has drifted into doing harm. Stop and r
 | `gh pr merge -d` to clear the remote | It deletes the local branch too — push a delete instead |
 | Deleting the branch without checking the PR merged | A failed merge plus a branch delete *closes* the PR — assert `state == MERGED` first |
 | Treating `BLOCKED` as something to work around | Protection is a decision someone made; report it and let the user choose `--admin` |
+| Reading `mergeStateStatus` once, right after creating the PR | It is `UNKNOWN` for the first few seconds — poll, or the check silently passes everything |
 | Reporting "shipped" after a stop | Name the step reached and what is left |
