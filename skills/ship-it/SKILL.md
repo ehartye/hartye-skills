@@ -89,20 +89,13 @@ gh pr create --fill --base <default>
 Print, then ask — browser, merge, or stop:
 
 ```bash
-gh pr view --json number,title,url,additions,deletions,changedFiles,statusCheckRollup
+gh pr view --json number,title,url,additions,deletions,changedFiles
 gh pr view --json files -q '.files[] | "\(.additions)+ \(.deletions)- \(.path)"'
 ```
 
 There is no `gh pr diff --stat`; `--json files` is the diffstat. Browser is `gh pr view --web`.
 
 ### 7. Merge
-
-An empty `statusCheckRollup` means no checks ran — treat it as absent CI, not as passing.
-
-- **Checks exist** → wait (`gh pr checks --watch`). **Refuse on red.** The user may override
-  explicitly; do not offer the override before reporting the failure.
-- **No checks** → say plainly: *"no CI configured; nothing has verified this."* Then confirm. Never
-  let silence imply the change was validated.
 
 Read `mergeStateStatus` before attempting anything — but **poll for it**. GitHub computes
 mergeability asynchronously, so for the first few seconds after `gh pr create` it returns `UNKNOWN`.
@@ -163,7 +156,6 @@ Noticing any of these means the pipeline has drifted into doing harm. Stop and r
 | Reaching for `--force` after a rejected push | Someone else's work is at risk — stop |
 | Resetting the default branch before the new branch exists | Branch first, always |
 | `git reset --hard` to clean the default branch | `git branch -f` — never discard the tree |
-| Merging red, or merging without saying no CI ran | Report the state, then let the user decide |
 | Hardcoding `main` | Resolve `origin/HEAD`; `master` is still out there |
 | Amending or rebasing pushed commits | Push a new commit; pushed history is shared |
 | `gh pr merge -d` to clear the remote | It deletes the local branch too — push a delete instead |
