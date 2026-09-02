@@ -40,6 +40,7 @@ which:
 | Fires, then behaves as if unread | Description summarizes the workflow; the model follows the summary instead of the body | `description` — Step 2 |
 | Fires, body read, one instruction ignored | That instruction is buried | Body position — Step 4 |
 | Two skills fight | Overlapping triggers | Library level — Step 5 |
+| Reference file never read | It is behind another reference, or nothing points at it | Tier assignment — Step 4 |
 | Output worse than no skill | Net-negative | Only a paired run shows this — Step 3 |
 
 You cannot diagnose the last one by reading. Say so rather than guessing.
@@ -124,7 +125,40 @@ Two to three realistic prompts is enough to start — the kind a real user would
 prompts written to make the skill look good. Add near-miss prompts that should *not* fire it;
 a skill that fires on everything is as broken as one that never fires.
 
-## 4. Structure, and why each rule exists
+## 4. Structure is tier assignment
+
+**Progressive disclosure is the architecture of the format, not a tip about length.** A skill
+loads in three tiers, each at a different moment:
+
+| Tier | What | Loads | Budget |
+| ---- | ---- | ----- | ------ |
+| 1. Metadata | `name` + `description` (+ `when_to_use`) | At startup, for **every installed skill** | ~100 tokens |
+| 2. Instructions | The `SKILL.md` body | When the skill activates | Under ~5000 tokens; under 500 lines |
+| 3. Resources | `scripts/` `references/` `assets/` | Only when something reads them | Unlimited; scripts run without loading |
+
+**So authoring or fixing a skill is deciding what belongs in which tier.** Every rule below is a
+consequence of that one decision, which is why they are not an arbitrary checklist:
+
+- **Triggers go in tier 1** — it is the only tier guaranteed to be read.
+- **The procedure goes in tier 2** — it is worthless until the skill fires, and every line here
+  competes for attention with every other line.
+- **Exhaustive reference, rare variants, API tables go in tier 3** — free there, expensive in
+  tier 2.
+- **Mutually-exclusive contexts get separate tier-3 files**, so only the relevant one loads.
+
+Tier 1 is not free: ~100 tokens times *every installed skill*, at every startup. A large library
+spends back the context the tiering saves, so a skill that could be a paragraph in an existing
+one should be.
+
+*This skill is the worked example:* a body you are reading now, and
+[references/evidence.md](references/evidence.md) — the sourcing, confidence levels and caveats —
+in tier 3, because you only need it when a rule is challenged.
+
+**Auditing question:** for each chunk of a skill, ask *which tier is this in, and which tier
+should it be in?* Misfiled content is most of what goes wrong — triggers stranded in the body,
+reference material bloating tier 2, a critical rule sitting in a file nothing reads.
+
+### The rules that follow from it
 
 Every rule here has a mechanism. Given a reason to break one, break it knowingly.
 
@@ -220,6 +254,7 @@ State plainly what inspection could not cover: whether the skill helps, and whet
 | Writing the skill, then testing it | Baseline first. A skill written from imagination fixes an imagined failure. |
 | Skipping the without-skill run because the skill obviously helps | That is the exact assumption the net-negative case violates |
 | Taking a skill's self-score as a result | It self-scored 0.92 on the output that proved it failed |
+| Judging a skill by its length alone | Length is a symptom. Ask which tier each part belongs in. |
 | Adding one more rule to a skill already carrying ten | Past ~5–6 they stop being followed together. Split it. |
 | Calling a skill safe because you read it | Reading cannot see invisible codepoints. Say what you actually checked. |
 | Treating the description contract as settled | It is contested. Choose by failure mode and say which you chose. |
