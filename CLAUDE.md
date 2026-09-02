@@ -38,7 +38,10 @@ the skill, record the failure verbatim, then write the minimum that fixes it.
 
 - **Directory name = skill name = frontmatter `name`.** Verb-first and hyphenated
   (`checking-broken-links`, not `link-checker`).
-- **Frontmatter is exactly two keys**, `name` and `description`. Nothing else is supported.
+- **Frontmatter: `name` and `description` carry the contract.** The Agent Skills spec requires
+  both, and requires `name` to match the directory. Claude Code supports many more optional keys
+  (`when_to_use`, `disable-model-invocation`, `user-invocable`, `argument-hint`, `context`, …) —
+  use them where they earn their place, knowing each one is a portability cost outside Claude Code.
 - **`description` says WHEN, never WHAT.** Start with "Use when…" and list concrete triggers,
   symptoms, and error strings. A description that summarizes the workflow becomes a shortcut the
   model takes *instead of* reading the skill body.
@@ -56,22 +59,19 @@ the skill, record the failure verbatim, then write the minimum that fixes it.
 - **No narrative.** "In session 2026-08-03 we discovered…" is not a skill. Skills are reusable
   technique, not a log of how something got solved once.
 
-## Commands
+## Slash commands
 
-Add a `commands/<name>.md` entry only when a skill genuinely needs a `/slash` trigger. The body
-should be one line that delegates:
+**Do not add a `commands/` directory.** Slash commands and skills merged in Claude Code v2.1.3;
+the docs state that `.claude/commands/deploy.md` and `.claude/skills/deploy/SKILL.md` "both create
+`/deploy` and work the same way," and the plugins reference is blunt: *"Use `skills/` for new
+plugins."* A skill is already invocable as `/<skill-name>`, so a command wrapper is a redundant
+second definition of the same trigger.
 
-```markdown
----
-description: "<when to use>"
-disable-model-invocation: true
----
+Invocation is controlled from the skill's own frontmatter instead:
 
-Invoke the hartye-skills:<skill-name> skill and follow it exactly as presented to you
-```
-
-`disable-model-invocation: true` prevents the command's description from competing with the
-skill's own description for model-invoked discovery.
+- `disable-model-invocation: true` — only reachable by typing `/name`; Claude will not load it automatically.
+- `user-invocable: false` — hidden from the `/` menu; background knowledge only.
+- `argument-hint` / `arguments` — autocomplete hint and named `$name` substitution.
 
 ## Releasing
 
