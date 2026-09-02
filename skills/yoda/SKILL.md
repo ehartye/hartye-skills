@@ -49,37 +49,57 @@ You cannot diagnose the last one by reading. Say so rather than guessing.
 It is the only part of a skill guaranteed to be read — name and description are preloaded for
 every installed skill. The body is never consulted for whether to load.
 
-**The hard constraint, which is undocumented:** Claude Code truncates each description to
-**250 characters** in the `/skills` listing. The Agent Skills spec permits 1024. A description
-can be spec-valid and lose three quarters of itself exactly where it does its job.
-`SLASH_COMMAND_TOOL_CHAR_BUDGET` raises the *total* metadata budget across skills; it does not
-lift the per-skill cap. **Everything that decides whether the skill fires must survive the
-first 250 characters.**
-
-Check it, don't estimate it:
+**It gets truncated, so check the length rather than estimating it.** Claude Code caps the
+combined `description` and `when_to_use` text at **1,536 characters** in the skill listing, and
+warns at startup when a description is truncated. Separately, `SLASH_COMMAND_TOOL_CHAR_BUDGET`
+governs the *aggregate* metadata budget across all installed skills — dynamically 2% of the
+context window — so a large library can push descriptions out of the listing even when each one
+is individually well under the cap. **Put what decides whether the skill fires first**, because
+truncation takes from the end.
 
 ```bash
 awk -F'description: ' '/^description: /{print length($2)}' SKILL.md
 ```
 
+*Version note:* this cap was **250 characters** until it was raised to 1,536. If you are reading
+guidance built on 250 — including older write-ups and the issue that documented it — it is
+describing superseded behavior. Confirm against the changelog rather than a secondary source;
+this exact number has already moved once.
+
 **Write triggers, not a synopsis.** Concrete phrases a user would actually say, symptoms, error
 strings, tool names. Third person. A description with no trigger conditions is the single most
 common reason a skill never fires.
 
-**On whether to also state what the skill does — the sources genuinely disagree, so decide
-deliberately rather than assuming:**
+**Use `when_to_use` for the triggers.** Claude Code has a dedicated frontmatter field for exactly
+this — "additional context for when Claude should invoke the skill, such as trigger phrases or
+example requests," appended to `description` in the listing and counting toward the same 1,536
+cap. It largely dissolves an old argument about whether a description should say *what* a skill
+does or *when* to use it: put the capability in `description`, put the trigger phrases in
+`when_to_use`, and stop making one field do both jobs.
 
-- *Trigger-only.* A description that summarizes the workflow becomes a shortcut the model takes
-  *instead of* reading the body. The reported case: a "code review between tasks" description
-  produced one review where the skill's own flowchart specified two.
-- *Both, and push.* Anthropic's own skill-creator says include what it does AND when, and make
-  it "a little bit pushy," because models under-trigger skills more often than they over-trigger.
+```yaml
+description: Audits and authors skills.
+when_to_use: Use when a skill never fires, fires but is ignored, or two skills compete.
+```
 
-They optimize against opposite failures. Under-triggering means the skill never loads;
-shortcutting means it loads and the body is skipped. Pick by which risk your skill actually
-runs: a rarely-relevant reference skill fails by never firing, a multi-step discipline skill
-fails by being summarized away. Never write a description that reads as a procedure the model
-could follow on its own.
+That argument still matters for portability, because `when_to_use` is a Claude Code field and not
+in the vendor-neutral spec — a skill that must also load under another agent has only
+`description` to work with. There, the sources do not weigh equally:
+
+- **Both what and when** — the Agent Skills spec defines `description` as "Describes what the
+  skill does and when to use it," and Anthropic's skill-creator says include both and make it "a
+  little bit pushy," because models under-trigger more often than they over-trigger.
+- **When only** — a community position, from testing that found a description summarizing a
+  workflow becomes a shortcut the model takes *instead of* reading the body. The reported case: a
+  "code review between tasks" description produced one review where the skill's flowchart
+  specified two.
+
+**The spec and the first-party guidance both say both.** Default to that. The trigger-only rule
+is a real observed failure, but it is narrower than it is usually stated — the danger is a
+description that reads as a *procedure the model could follow on its own*, not one that names a
+capability. "Audits and authors skills" is a capability. "First check frontmatter, then measure
+the description, then run a baseline" is a procedure, and that is the one that gets followed
+instead of the body.
 
 ## 3. The baseline is the test
 
@@ -114,9 +134,32 @@ Every rule here has a mechanism. Given a reason to break one, break it knowingly
 | Front-load what matters | Attention is U-shaped — start and end are read, the middle degrades toward random |
 | References exactly one level deep | Agents read nested chains incompletely and stop short of the content |
 | Table of contents on reference files over ~300 lines | Otherwise the agent reads the top and guesses the rest |
-| Directory name = frontmatter `name` | A mismatch means it does not resolve |
+| Frontmatter `name` matching the directory | Not a load failure — see below. Mismatch changes the command users type |
 | Imperative instructions with a verifiable done-condition | "Consider whether the tag is correct" produces different actions every run |
 | Split by mutually-exclusive context | Only the relevant file loads; the rest costs nothing |
+
+### Two contracts, and they differ
+
+You are writing against a vendor-neutral spec *and* one implementation. They are not the same,
+and the gap is where portability bugs live.
+
+| | Agent Skills spec | Claude Code |
+| --- | --- | --- |
+| `name` | **Required.** 1–64 chars, lowercase alphanumeric and hyphens, no leading/trailing or consecutive hyphens, **must match the parent directory** | **Optional.** Display label for personal/project skills, where the directory sets the command. In a *plugin* skill it sets the command's last segment, namespaced by plugin |
+| `description` | **Required**, 1–1024 chars | Recommended; combined with `when_to_use` and capped at 1,536 in the listing |
+| `when_to_use` | Not in the spec | Supported |
+| Body | "under 500 lines"; instructions tier under ~5000 tokens | "Keep `SKILL.md` under 500 lines" |
+| Layout | `scripts/` `references/` `assets/`, relative paths from the skill root | Same |
+
+**So a name/directory mismatch is not the load failure it is often reported as.** In Claude Code
+the skill still resolves — a plugin skill in `skills/review/` carrying `name: fancy` becomes
+`/plugin:fancy`, which is a discoverability surprise, not a break. But it *violates the spec*,
+so the skill stops being portable. **Match them anyway:** required by the spec, harmless in
+Claude Code, and the only choice that works everywhere.
+
+Prefer spec-required fields when a skill might travel. `allowed-tools` is marked experimental in
+the spec and support varies; anything Claude-specific (`when_to_use`, `context: fork`, `model`,
+`hooks`, `paths`) is a portability cost you should take knowingly.
 
 **Count the simultaneous constraints.** Compliance with *all* of a set collapses nonlinearly —
 a model honoring individual constraints ~41% of the time satisfies all eight together 5.7% of
@@ -162,7 +205,7 @@ Flag it explicitly when auditing a skill you did not write.
 
 Lead with the failure mode, not the file order. For each finding: the symptom the user would
 notice, the mechanism, the fix. Separate what you verified from what you inferred — "the
-description is 266 characters, over the 250 cap" is verified; "this is probably why it doesn't
+description is 1,900 characters, over the 1,536 cap" is verified; "this is probably why it doesn't
 fire" is inference until a paired run says so.
 
 State plainly what inspection could not cover: whether the skill helps, and whether it is safe.
@@ -172,7 +215,7 @@ State plainly what inspection could not cover: whether the skill helps, and whet
 | Signal | Instead |
 | ------ | ------- |
 | Fixing wording before naming the failure | Diagnose first — the symptom picks the fix |
-| Estimating description length | Count it; 250 is a hard cap, not a guideline |
+| Estimating description length | Count it. And check the current cap — it moved from 250 to 1,536 once already |
 | "The description reads fine" | Fine to you is not a trigger match. Would the phrasing a user types appear in it? |
 | Writing the skill, then testing it | Baseline first. A skill written from imagination fixes an imagined failure. |
 | Skipping the without-skill run because the skill obviously helps | That is the exact assumption the net-negative case violates |

@@ -7,7 +7,8 @@ this file.
 
 ## Contents
 
-- [The 250-character cap](#the-250-character-cap)
+- [Two contracts: spec vs Claude Code](#two-contracts-spec-vs-claude-code)
+- [The description listing cap](#the-description-listing-cap)
 - [The description contract is contested](#the-description-contract-is-contested)
 - [Position and length](#position-and-length)
 - [Simultaneous constraints](#simultaneous-constraints)
@@ -19,26 +20,85 @@ this file.
 
 ---
 
-## The 250-character cap
+## Two contracts: spec vs Claude Code
 
-Claude Code changelog v2.1.86: "Skill descriptions in the `/skills` listing are now capped at
-250 characters to reduce context usage." This appears in no documentation page; it is recorded
-in `anthropics/claude-code` issue #40121, which also establishes that `SLASH_COMMAND_TOOL_CHAR_BUDGET`
-adjusts the *aggregate* metadata budget across skills (dynamically 2% of the context window,
-fallback 16,000 characters) and does **not** lift the per-description cap.
+Every rule about frontmatter has two authorities, and they disagree. Checked against the
+agentskills.io specification and the live Claude Code skills documentation.
 
-The Agent Skills specification permits `description` up to 1024 characters. Both are true: a
-description can be spec-valid and still be truncated to under a quarter of its length at the
-point where it decides whether the skill loads.
+**Agent Skills specification** (vendor-neutral):
 
-**Confidence: high.** First-party changelog and issue tracker. **Caveat:** it is a version-specific
-behavior of one implementation and could change; re-check the changelog if a description that
-should fire reliably doesn't.
+- `name` is **required**: 1–64 characters, lowercase alphanumeric and hyphens only, must not
+  start or end with a hyphen, must not contain consecutive hyphens, and **"Must match the parent
+  directory name."**
+- `description` is **required**: 1–1024 characters, and "Describes what the skill does and when
+  to use it."
+- Optional: `license`, `compatibility` (max 500 chars), `metadata`, and `allowed-tools`,
+  which is marked **experimental**.
+- Layout: `scripts/` `references/` `assets/`, referenced by relative paths from the skill root.
+- Progressive disclosure in three tiers: metadata ~100 tokens loaded at startup for all skills;
+  instructions "< 5000 tokens recommended" loaded on activation; resources loaded only when
+  required. "Keep your main SKILL.md under 500 lines."
+
+**Claude Code** (one implementation):
+
+- `name` is **optional**. In a personal or project skill it "sets only the display label shown in
+  skill listings, and the command still comes from the directory name." In a **plugin** skill it
+  "sets the last segment of the command and the plugin prefix stays in place" — so
+  `my-plugin/skills/review/SKILL.md` with `name: fancy` becomes `/my-plugin:fancy`.
+- `description` is Recommended, not required; if omitted, the first paragraph of the body is used.
+- Many more optional fields exist: `when_to_use`, `argument-hint`, `arguments`,
+  `disable-model-invocation`, `user-invocable`, `allowed-tools`, `disallowed-tools`,
+  `model`, `effort`, `context`, `agent`, `background`, `hooks`, `paths`, `shell`.
+- Same body guidance: "Keep SKILL.md under 500 lines. Move detailed reference material to
+  separate files."
+
+**The consequence for auditing:** a name/directory mismatch is routinely reported as "the skill
+does not load." In Claude Code that is false — it resolves, under a different command name. It
+is nonetheless a real defect, because the spec requires the match and the skill stops being
+portable. Report it as a portability violation and a discoverability surprise, not a load
+failure.
+
+**On `commands/`:** slash commands and skills merged in Claude Code v2.1.3. The docs state that
+a command file and a skill "both create /deploy and work the same way," that existing
+`.claude/commands/` files keep working, and that "Skills are recommended since they support
+additional features like supporting files." Command files ignore `name` and `paths`. A
+`commands/` wrapper around a skill is a redundant second definition of the same trigger.
+## The description listing cap
+
+**Current value: 1,536 characters**, covering the combined `description` and `when_to_use` text in
+the skill listing. Claude Code emits a startup warning when a description is truncated. Source: the
+skills documentation frontmatter reference, and the changelog entry "raised the listing cap from
+250 to 1,536 characters and added a startup warning when descriptions are truncated."
+
+**This number has already moved once**, and that history is the useful part. Changelog v2.1.86 set
+a 250-character cap; `anthropics/claude-code` issue #40121 documented it as undocumented and
+argued authors should front-load trigger words. A later entry raised it to 1,536. Guidance written
+against the 250 figure — including that issue, and secondary write-ups derived from it — describes
+superseded behavior.
+
+Separately and still current: `SLASH_COMMAND_TOOL_CHAR_BUDGET` governs the *aggregate* metadata
+budget across all installed skills, scaling dynamically at 2% of the context window with a 16,000
+character fallback. It is a different limit from the per-listing cap, and a large library can push
+descriptions out of the listing even when each is individually short.
+
+The Agent Skills specification separately permits `description` up to 1024 characters — a third
+number, from the vendor-neutral spec rather than the implementation.
+
+**Confidence: high for 1,536 today. Low for it staying there.** Three different caps have applied
+to this field. Verify against the changelog before relying on any specific figure, and prefer the
+durable rule — front-load what triggers the skill, because truncation takes from the end — over the
+number itself.
+
+**Method note:** this correction exists because the first draft of yoda built a headline rule on
+the 250 figure taken from issue #40121 without reconciling it against the documentation already
+available. A single source reporting a constraint is a claim about one point in time; a changelog
+is the record of whether it still holds.
 
 ## The description contract is contested
 
-Two authoritative sources give opposed instructions. Neither has refuted the other, and yoda
-does not resolve it — it asks the author to choose deliberately.
+**Two of the three authorities say the same thing, so this is less balanced than it is usually
+presented.** Claude Code also now ships a dedicated `when_to_use` field, which removes most of
+the pressure from the argument by giving trigger phrases their own home.
 
 **Trigger-only** (obra/superpowers, `anthropic-best-practices.md`): the description states when
 to use the skill, in third person, and never summarizes the process. Stated reason, from their
@@ -55,13 +115,19 @@ example appending "Make sure to use this skill whenever the user mentions dashbo
 visualization, internal metrics, or wants to display any kind of company data, even if they
 don't explicitly ask for a 'dashboard.'"
 
-**Reconciliation (inference, not stated by either source):** they target opposite failures.
-Trigger-only optimizes against shortcutting; pushy optimizes against under-triggering. Which
-dominates depends on the skill — a rarely-relevant reference skill fails by never firing, a
-multi-step discipline skill fails by being summarized away. No source tests both failure modes
-against each other, so treat this as a way to choose, not as a finding.
+**The Agent Skills specification sides with "both"**: it defines `description` as "Describes what
+the skill does and when to use it." So trigger-only is a community position held against both the
+vendor-neutral spec and the first-party meta-skill — worth knowing before treating the three as
+co-equal.
 
-Both agree on: the description is the triggering mechanism, and vagueness is fatal.
+**Reconciliation (inference, not stated by any source):** the trigger-only rule is real but
+narrower than it is usually stated. The observed failure is a description that reads as a
+*procedure the model could follow on its own* — that is what gets followed instead of the body.
+A description naming a capability does not create that shortcut. Default to what-and-when per the
+spec, put trigger phrases in `when_to_use` where the implementation supports it, and never let the
+description become a summary of the steps.
+
+All three agree on: the description is the triggering mechanism, and vagueness is fatal.
 
 ## Position and length
 
