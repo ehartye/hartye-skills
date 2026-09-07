@@ -59,7 +59,7 @@ is individually well under the cap. **Put what decides whether the skill fires f
 truncation takes from the end.
 
 ```bash
-awk -F'description: ' '/^description: /{print length($2)}' SKILL.md
+sed -n 's/^description: //p' SKILL.md | head -1 | tr -d '\n' | wc -c
 ```
 
 *Version note:* this cap was **250 characters** until it was raised to 1,536. If you are reading
@@ -171,6 +171,30 @@ Every rule here has a mechanism. Given a reason to break one, break it knowingly
 | Frontmatter `name` matching the directory | Not a load failure — see below. Mismatch changes the command users type |
 | Imperative instructions with a verifiable done-condition | "Consider whether the tag is correct" produces different actions every run |
 | Split by mutually-exclusive context | Only the relevant file loads; the rest costs nothing |
+| No dollar-digit or dollar-ARGUMENTS placeholders in shell snippets | They are argument placeholders and get substituted before you see the body — see below |
+
+**Argument substitution silently rewrites your body.** Claude Code substitutes the
+full-arguments placeholder, its indexed form, and the dollar-digit shorthand (`$N` for N in 0–9)
+with the arguments the skill was invoked with. This applies to the whole body, **including fenced
+code blocks** — nothing exempts a shell snippet.
+
+So an awk field reference like dollar-2, inside a skill invoked as `/skill fix a new thing`,
+renders as `length(new)`. Still valid awk, silently wrong, and invisible unless you read the
+*rendered* skill rather than the file on disk. Anything using positional parameters is exposed:
+awk field references, shell function arguments, `sh -c` one-liners.
+
+Write around it — prefer tools that need no positional parameters:
+
+```bash
+sed -n 's/^description: //p' SKILL.md | head -1 | tr -d '\n' | wc -c
+```
+
+Audit for it, and confirm every hit is a placeholder you actually meant. The character classes
+below keep this command from matching itself:
+
+```bash
+grep -nE '[$][0-9]|[$]ARG' SKILL.md
+```
 
 ### Two contracts, and they differ
 
@@ -250,6 +274,7 @@ State plainly what inspection could not cover: whether the skill helps, and whet
 | ------ | ------- |
 | Fixing wording before naming the failure | Diagnose first — the symptom picks the fix |
 | Estimating description length | Count it. And check the current cap — it moved from 250 to 1,536 once already |
+| A shell snippet in a skill body using positional parameters | Argument substitution rewrites them. Read the rendered skill, not just the file. |
 | "The description reads fine" | Fine to you is not a trigger match. Would the phrasing a user types appear in it? |
 | Writing the skill, then testing it | Baseline first. A skill written from imagination fixes an imagined failure. |
 | Skipping the without-skill run because the skill obviously helps | That is the exact assumption the net-negative case violates |
