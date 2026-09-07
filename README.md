@@ -41,6 +41,7 @@ For local development against this checkout:
 | Skill | Use when |
 | ----- | -------- |
 | [beautiful](skills/beautiful/SKILL.md) | Building or reshaping any user-facing interface, or a design reads as templated and AI-generated. Covers aesthetic direction, typography, palette, layout, motion, and interface copy. |
+| [rubber-duck](skills/rubber-duck/SKILL.md) | You want a second opinion that is not just you again — stuck, pre-commitment on something hard to reverse, or asked to sanity check or red-team. Consults the other vendor's model and records it verbatim to `docs/rubber-duck/`. |
 | [ship-it](skills/ship-it/SKILL.md) | You want pending work committed, pushed, PR'd and squash-merged in one step — including when it's sitting on the default branch. |
 | [yoda](skills/yoda/SKILL.md) | Writing, editing, or reviewing a SKILL.md, or auditing a skill library — including when a skill never fires, fires but is ignored, or competes with another. |
 
@@ -55,13 +56,13 @@ hartye-skills/
     <skill-name>/
       SKILL.md           # required — the skill itself
       <supporting files> # only when a script or heavy reference is needed
-  commands/              # optional — slash commands that invoke a skill
   README.md
   CLAUDE.md              # conventions for working in this repo
 ```
 
-`commands/` is created only when a skill wants an explicit `/slash` entry point. Most skills here
-should be model-invoked off their `description` alone.
+Every skill is invocable as `/<skill-name>` on its own — slash commands and skills are one
+mechanism — so there is no `commands/` directory. Control invocation from the skill's own
+frontmatter (`disable-model-invocation`, `user-invocable`) rather than a wrapper file.
 
 ## Adding a skill
 

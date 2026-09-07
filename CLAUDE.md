@@ -42,9 +42,15 @@ the skill, record the failure verbatim, then write the minimum that fixes it.
   both, and requires `name` to match the directory. Claude Code supports many more optional keys
   (`when_to_use`, `disable-model-invocation`, `user-invocable`, `argument-hint`, `context`, …) —
   use them where they earn their place, knowing each one is a portability cost outside Claude Code.
-- **`description` says WHEN, never WHAT.** Start with "Use when…" and list concrete triggers,
-  symptoms, and error strings. A description that summarizes the workflow becomes a shortcut the
-  model takes *instead of* reading the skill body.
+- **`description` carries the capability; `when_to_use` carries the triggers.** The Agent Skills
+  spec defines `description` as "what the skill does and when to use it," so a capability sentence
+  belongs there; put the concrete trigger phrases, symptoms and error strings in `when_to_use`.
+  The real rule is narrower than "never say WHAT": **never let a description read as a procedure
+  the model could follow instead of the body.** "Gets a second opinion from another vendor's
+  model" is a capability. "First check frontmatter, then measure the description, then run a
+  baseline" is a procedure, and that is the shape that becomes a shortcut.
+  Existing skills opening with "Use when…" are fine and are not being rewritten — that form also
+  satisfies the rule. See `hartye-skills:yoda` for the evidence and the contested history.
 - **Budget words by how the skill loads, not by a flat cap.** The ~500-word guidance in
   `writing-skills` exists to protect context in skills that load into *every* conversation. Nothing
   here does — these are model-invoked on demand, so the cost is paid only when the skill is
