@@ -1,6 +1,7 @@
 ---
 name: yoda
-description: Use when writing, editing, or reviewing a SKILL.md, auditing a skill library, or when a skill never fires, fires but is ignored, triggers on wrong prompts, two skills compete, or a skill "doesn't seem to work."
+description: Guidance for writing, reviewing and auditing agent skills (SKILL.md files) and for diagnosing skills that never fire, get ignored, trigger on the wrong prompts or compete with each other.
+when_to_use: Use when writing, editing, or reviewing a SKILL.md, auditing a skill library, or when a skill never fires, fires but is ignored, triggers on wrong prompts, two skills compete, or a skill "doesn't seem to work."
 ---
 
 # Yoda
