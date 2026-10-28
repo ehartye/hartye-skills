@@ -26,8 +26,8 @@ worked example.
 
 ## Authoring discipline
 
-**REQUIRED:** Use the `h-superpowers:writing-skills` skill before writing or editing any
-`SKILL.md`. It is TDD applied to process documentation, and the Prime Directive holds:
+Writing or editing a `SKILL.md` is TDD applied to process documentation, and the Prime Directive
+holds (`hartye-skills:yoda` holds the method and the evidence):
 
 > No skill without a failing test first.
 
@@ -51,8 +51,8 @@ the skill, record the failure verbatim, then write the minimum that fixes it.
   baseline" is a procedure, and that is the shape that becomes a shortcut.
   Existing skills opening with "Use when…" are fine and are not being rewritten — that form also
   satisfies the rule. See `hartye-skills:yoda` for the evidence and the contested history.
-- **Budget words by how the skill loads, not by a flat cap.** The ~500-word guidance in
-  `writing-skills` exists to protect context in skills that load into *every* conversation. Nothing
+- **Budget words by how the skill loads, not by a flat cap.** The usual ~500-word guidance for
+  skills exists to protect context in skills that load into *every* conversation. Nothing
   here does — these are model-invoked on demand, so the cost is paid only when the skill is
   actually relevant. Be concise because concision is clearer, not to hit a number.
   - A skill that is one procedure should read as one procedure; if it needs eight steps, write
@@ -60,8 +60,11 @@ the skill, record the failure verbatim, then write the minimum that fixes it.
   - Push genuinely optional reference — API tables, exhaustive syntax — into a sibling file the
     skill links to.
   - If a skill is long because it covers two unrelated jobs, that's a split, not a trim.
-- **Cross-reference by name, never with `@`.** Write `**REQUIRED:** Use h-superpowers:brainstorming`.
+- **Cross-reference by name, never with `@`.** Write `**REQUIRED:** Use hartye-skills:yoda`.
   An `@path` force-loads the file and burns context immediately.
+- **Self-contained guidance.** A skill's body and references never require, or send the reader to, a
+  skill from another plugin, unless the skill declares that dependency in its opening paragraph
+  (`spec-plan` declares wiki-master). Cite external evidence as a source, not as a dependency.
 - **No narrative.** "In session 2026-08-03 we discovered…" is not a skill. Skills are reusable
   technique, not a log of how something got solved once.
 

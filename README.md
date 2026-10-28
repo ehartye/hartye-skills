@@ -69,7 +69,7 @@ frontmatter (`disable-model-invocation`, `user-invocable`) rather than a wrapper
 
 See `CLAUDE.md` for the full working agreement. The short version:
 
-1. Write a baseline test first — see the `h-superpowers:writing-skills` skill. No skill ships
+1. Write a baseline test first — see the `yoda` skill. No skill ships
    without watching an agent fail without it.
 2. Create `skills/<verb-first-name>/SKILL.md` with `name` and `description` frontmatter. The
    `description` states what the skill does, never as a procedure; put the triggers in `when_to_use`.
