@@ -43,6 +43,7 @@ For local development against this checkout:
 | [beautiful](skills/beautiful/SKILL.md) | Building or reshaping any user-facing interface, or a design reads as templated and AI-generated. Covers aesthetic direction, typography, palette, layout, motion, and interface copy. |
 | [rubber-duck](skills/rubber-duck/SKILL.md) | You want a second opinion that is not just you again — stuck, pre-commitment on something hard to reverse, or asked to sanity check or red-team. Consults the other vendor's model and records it verbatim to `docs/rubber-duck/`. |
 | [ship-it](skills/ship-it/SKILL.md) | You want pending work committed, pushed, PR'd and squash-merged in one step — including when it's sitting on the default branch. |
+| [spec-plan](skills/spec-plan/SKILL.md) | You want a feature, change or spike specced before it is built: an interview, a wiki search, and a spec saved on the project roadmap that plan mode turns into a question-free plan. Execution runs the work in parallel subagents. |
 | [yoda](skills/yoda/SKILL.md) | Writing, editing, or reviewing a SKILL.md, or auditing a skill library — including when a skill never fires, fires but is ignored, or competes with another. |
 
 ## Layout
