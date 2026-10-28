@@ -31,12 +31,18 @@ where you start. Both end at the same place: a baseline comparison.
 
 ## 1. Diagnose before prescribing
 
-Name the failure before touching the file. They have different fixes and the symptom tells you
-which:
+Name the failure before touching the file; the symptom tells you the fix. *Outside* rows are
+causes outside the `description`: rule them out when it reads fine. Sources and untested claims:
+[references/evidence.md](references/evidence.md#causes-outside-the-description).
 
 | Symptom | Failure | Where to look |
 | ------- | ------- | ------------- |
 | Never fires | Description doesn't match how anyone phrases the task | `description` — Step 2 |
+| Never fires, description reads fine | *Outside:* description not in context: dropped from an over-budget listing (every name is kept), `"name-only"` in `skillOverrides`, or `disable-model-invocation: true` | Ask a fresh session "What skills are available?"; `--debug`; `/skills` menu. No command is documented to list the dropped ones: UNSETTLED. Budget — Step 2 |
+| Loads, but fields do nothing, `/name` works | *Outside:* YAML that does not parse (the skill still loads with no fields set), an opening `---` not on line 1, or a misspelled field (ignored, no error) | `--debug` shows a parse error; `claude plugin validate` on the skills directory; nothing reports a misspelling, so compare it with the docs' field table |
+| Works in one worktree, not another | *Outside:* `paths` matches only files under the current working directory, not a sibling worktree, even one added with `/add-dir` | Start Claude Code in that worktree or `/cd`. Glob syntax, nested worktrees, `paths` on a plugin skill: UNTESTED |
+| Missing from the `/` menu | *Outside:* a refused character in the name (control, no-break space, `<`, `>`) | `claude --debug`, search the log for `[names]` |
+| Followed at first, then stops | *Outside:* invoked content is not re-read; compaction keeps only the first 5,000 tokens of each recent skill | Re-invoke it; hook for a rule that must hold; key instructions first |
 | Fires on the wrong prompts | Description over-claims | `description` — Step 2 |
 | Fires, then behaves as if unread | Description summarizes the workflow; the model follows the summary instead of the body | `description` — Step 2 |
 | Fires, body read, one instruction ignored | That instruction is buried | Body position — Step 4 |
@@ -46,27 +52,33 @@ which:
 
 You cannot diagnose the last one by reading. Say so rather than guessing.
 
-## 2. The description is the whole triggering mechanism
+## 2. The description is the triggering mechanism
 
-It is the only part of a skill guaranteed to be read — name and description are preloaded for
-every installed skill. The body is never consulted for whether to load.
+It is the only part of a skill the model sees before deciding to load it, and only while the
+listing still carries it (Step 1, *Outside* rows). The body is never consulted for whether to load.
 
 **It gets truncated, so check the length rather than estimating it.** Claude Code caps the
-combined `description` and `when_to_use` text at **1,536 characters** in the skill listing, and
-warns at startup when a description is truncated. Separately, `SLASH_COMMAND_TOOL_CHAR_BUDGET`
-governs the *aggregate* metadata budget across all installed skills — dynamically 2% of the
-context window — so a large library can push descriptions out of the listing even when each one
-is individually well under the cap. **Put what decides whether the skill fires first**, because
-truncation takes from the end.
+combined `description` and `when_to_use` text at **1,536 characters** per entry by default
+(`skillListingMaxDescChars`). The whole listing has its own budget, **1% of the context window** by
+default (`skillListingBudgetFraction`; `SLASH_COMMAND_TOOL_CHAR_BUDGET` is the legacy fixed
+character count). Every skill name is always kept; over budget, the descriptions of the skills
+invoked least go first, even when each is under the cap. The overflow warning is in the debug log,
+not at startup. `"name-only"` in `skillOverrides` frees budget, not for plugin skills (use `/plugin`).
+**Put what decides whether the skill fires first**; the cut takes from the end. **Unsettled:** when
+the 8,000-character fallback (env-vars page only) applies, what "least invoked" ranks by, whether
+plugin skills are dropped, variable-versus-setting precedence, whether `/doctor` lists dropped ones.
 
 ```bash
-sed -n 's/^description: //p' SKILL.md | head -1 | tr -d '\n' | wc -c
+awk 'function cnt(s, c) { c = "LC_ALL=C tr -d \200-\277 | wc -c | tr -cd 0-9"; fflush(); printf "%s", s | c; close(c) }
+function row(k, v) { if (!(k in r)) return; v = r[k]; if (b[k] != "") v = v (b[k] ~ /-/ ? "" : "\n"); else if (v ~ /^["\047]/) gsub(/^["\047]|["\047][ \t]*(#.*)?$/, "", v); else sub(/[ \t]+#.*/, "", v); all = all v; cnt(v); sub(/\n$/, "", v); print " " k ": " v }
+BEGIN { while ((getline l) > 0) { sub(/[ \t\r]+$/, "", l); if (FNR == 1) { on = (l == "---"); k = ""; all = ""; delete r; delete b; print FILENAME; continue }
+  if (!on) continue; if (l == "---") { on = 0; row("description"); row("when_to_use"); cnt(all); print " total"; continue }
+  if (l ~ /^(description|when_to_use):/) { k = l; sub(/:.*/, "", k); sub(/^[^:]*:[ \t]*/, "", l); r[k] = ""; b[k] = (l ~ /^[>|]/ ? l : ""); if (b[k] != "") l = "" } else if (l ~ /^[^ \t]/) k = ""; if (k == "") continue; sub(/^[ \t]+/, "", l); if (l != "") r[k] = r[k] (r[k] == "" ? "" : " ") l } }' SKILL.md
 ```
 
-*Version note:* this cap was **250 characters** until it was raised to 1,536. If you are reading
-guidance built on 250 — including older write-ups and the issue that documented it — it is
-describing superseded behavior. Confirm against the changelog rather than a secondary source;
-this exact number has already moved once.
+Run it on one file or over `skills/*/SKILL.md` (Step 5). It reads frontmatter only (`---` on line 1); `total` is `description` plus `when_to_use`, in characters.
+
+*Version note:* the per-entry cap was **250 characters** before 1,536; guidance built on 250 is superseded.
 
 **Write triggers, not a synopsis.** Concrete phrases a user would actually say, symptoms, error
 strings, tool names. Third person. A description with no trigger conditions is the single most
@@ -133,27 +145,24 @@ loads in three tiers, each at a different moment:
 
 | Tier | What | Loads | Budget |
 | ---- | ---- | ----- | ------ |
-| 1. Metadata | `name` + `description` (+ `when_to_use`) | At startup, for **every installed skill** | ~100 tokens |
+| 1. Metadata | `name` + `description` (+ `when_to_use`) | At startup: every name; descriptions can be dropped (Step 1) | ~100 tokens |
 | 2. Instructions | The `SKILL.md` body | When the skill activates | Under ~5000 tokens; under 500 lines |
 | 3. Resources | `scripts/` `references/` `assets/` | Only when something reads them | Unlimited; scripts run without loading |
 
 **So authoring or fixing a skill is deciding what belongs in which tier.** Every rule below is a
 consequence of that one decision, which is why they are not an arbitrary checklist:
 
-- **Triggers go in tier 1** — it is the only tier guaranteed to be read.
+- **Triggers go in tier 1** — it is the only tier read before the skill fires.
 - **The procedure goes in tier 2** — it is worthless until the skill fires, and every line here
   competes for attention with every other line.
-- **Exhaustive reference, rare variants, API tables go in tier 3** — free there, expensive in
-  tier 2.
+- **Exhaustive reference, rare variants, API tables go in tier 3** — free there, costly in tier 2.
 - **Mutually-exclusive contexts get separate tier-3 files**, so only the relevant one loads.
 
-Tier 1 is not free: ~100 tokens times *every installed skill*, at every startup. A large library
-spends back the context the tiering saves, so a skill that could be a paragraph in an existing
-one should be.
+Tier 1 is not free: ~100 tokens per listed skill, and a large library overflows the listing, so
+descriptions get dropped (Step 1). A skill that could be a paragraph in an existing one should be.
 
 *This skill is the worked example:* a body you are reading now, and
-[references/evidence.md](references/evidence.md) — the sourcing, confidence levels and caveats —
-in tier 3, because you only need it when a rule is challenged.
+[references/evidence.md](references/evidence.md), the sourcing and caveats, in tier 3.
 
 **Auditing question:** for each chunk of a skill, ask *which tier is this in, and which tier
 should it be in?* Misfiled content is most of what goes wrong — triggers stranded in the body,
@@ -184,11 +193,7 @@ renders as `length(new)`. Still valid awk, silently wrong, and invisible unless 
 *rendered* skill rather than the file on disk. Anything using positional parameters is exposed:
 awk field references, shell function arguments, `sh -c` one-liners.
 
-Write around it — prefer tools that need no positional parameters:
-
-```bash
-sed -n 's/^description: //p' SKILL.md | head -1 | tr -d '\n' | wc -c
-```
+Write around it — prefer tools that need no positional parameters, as the Step 2 command does (`getline`, not fields).
 
 Audit for it, and confirm every hit is a placeholder you actually meant. The character classes
 below keep this command from matching itself:
@@ -220,12 +225,9 @@ Prefer spec-required fields when a skill might travel. `allowed-tools` is marked
 the spec and support varies; anything Claude-specific (`when_to_use`, `context: fork`, `model`,
 `hooks`, `paths`) is a portability cost you should take knowingly.
 
-**Count the simultaneous constraints.** Compliance with *all* of a set collapses nonlinearly —
-a model honoring individual constraints ~41% of the time satisfies all eight together 5.7% of
-the time, and reliability breaks down past roughly five or six. Constraints requiring sustained
-tracking degrade about twice as fast as simple ones. A skill imposing a dozen simultaneous rules
-is unlikely to have them all honored however well each is written. **If a skill needs more,
-that is a split, not a longer file.**
+**Count the simultaneous constraints.** Compliance with *all* of a set collapses nonlinearly: a
+model honoring each constraint ~41% of the time satisfies all eight together 5.7% of the time, and
+reliability breaks down past five or six. **If a skill needs more, split it.**
 
 A long skill is not automatically wrong. A long skill with its load-bearing instruction in
 paragraph 12 is.
@@ -240,9 +242,7 @@ Some failures only exist between skills and are invisible when reviewing one:
 - **Overlap with a skill that already wins.** If an existing skill reliably handles the case,
   a second one competing for it makes both less reliable.
 
-```bash
-grep -h '^description:' skills/*/SKILL.md
-```
+Run the Step 2 command over `skills/*/SKILL.md` and read every description and `when_to_use` together.
 
 ## 6. Reading a skill cannot certify it is safe
 
