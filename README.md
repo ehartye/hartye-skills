@@ -71,7 +71,7 @@ See `CLAUDE.md` for the full working agreement. The short version:
 1. Write a baseline test first — see the `h-superpowers:writing-skills` skill. No skill ships
    without watching an agent fail without it.
 2. Create `skills/<verb-first-name>/SKILL.md` with `name` and `description` frontmatter. The
-   description states *when to use it*, never what it does.
+   `description` states what the skill does, never as a procedure; put the triggers in `when_to_use`.
 3. Add a row to the Skills table above.
 4. Bump the version in **both** `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`.
 

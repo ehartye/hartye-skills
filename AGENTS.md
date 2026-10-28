@@ -1,6 +1,8 @@
 # AGENTS.md — hartye-skills
 
-This repo is a Codex plugin: a grab bag of general-purpose utility skills. It ships no
+> Mirrors `CLAUDE.md` for tools that read `AGENTS.md`. Change `CLAUDE.md` first, then copy the change here.
+
+This repo is a Claude Code plugin: a grab bag of general-purpose utility skills. It ships no
 runtime code of its own. The deliverable is the prose in `skills/*/SKILL.md`.
 
 ## Admission criteria
@@ -39,12 +41,18 @@ the skill, record the failure verbatim, then write the minimum that fixes it.
 - **Directory name = skill name = frontmatter `name`.** Verb-first and hyphenated
   (`checking-broken-links`, not `link-checker`).
 - **Frontmatter: `name` and `description` carry the contract.** The Agent Skills spec requires
-  both, and requires `name` to match the directory. Codex supports many more optional keys
+  both, and requires `name` to match the directory. Claude Code supports many more optional keys
   (`when_to_use`, `disable-model-invocation`, `user-invocable`, `argument-hint`, `context`, …) —
-  use them where they earn their place, knowing each one is a portability cost outside Codex.
-- **`description` says WHEN, never WHAT.** Start with "Use when…" and list concrete triggers,
-  symptoms, and error strings. A description that summarizes the workflow becomes a shortcut the
-  model takes *instead of* reading the skill body.
+  use them where they earn their place, knowing each one is a portability cost outside Claude Code.
+- **`description` carries the capability; `when_to_use` carries the triggers.** The Agent Skills
+  spec defines `description` as "what the skill does and when to use it," so a capability sentence
+  belongs there; put the concrete trigger phrases, symptoms and error strings in `when_to_use`.
+  The real rule is narrower than "never say WHAT": **never let a description read as a procedure
+  the model could follow instead of the body.** "Gets a second opinion from another vendor's
+  model" is a capability. "First check frontmatter, then measure the description, then run a
+  baseline" is a procedure, and that is the shape that becomes a shortcut.
+  Existing skills opening with "Use when…" are fine and are not being rewritten — that form also
+  satisfies the rule. See `hartye-skills:yoda` for the evidence and the contested history.
 - **Budget words by how the skill loads, not by a flat cap.** The ~500-word guidance in
   `writing-skills` exists to protect context in skills that load into *every* conversation. Nothing
   here does — these are model-invoked on demand, so the cost is paid only when the skill is
@@ -61,15 +69,15 @@ the skill, record the failure verbatim, then write the minimum that fixes it.
 
 ## Slash commands
 
-**Do not add a `commands/` directory.** Slash commands and skills merged in Codex v2.1.3;
-the docs state that `.Codex/commands/deploy.md` and `.Codex/skills/deploy/SKILL.md` "both create
+**Do not add a `commands/` directory.** Slash commands and skills merged in Claude Code v2.1.3;
+the docs state that `.claude/commands/deploy.md` and `.claude/skills/deploy/SKILL.md` "both create
 `/deploy` and work the same way," and the plugins reference is blunt: *"Use `skills/` for new
 plugins."* A skill is already invocable as `/<skill-name>`, so a command wrapper is a redundant
 second definition of the same trigger.
 
 Invocation is controlled from the skill's own frontmatter instead:
 
-- `disable-model-invocation: true` — only reachable by typing `/name`; Codex will not load it automatically.
+- `disable-model-invocation: true` — only reachable by typing `/name`; Claude will not load it automatically.
 - `user-invocable: false` — hidden from the `/` menu; background knowledge only.
 - `argument-hint` / `arguments` — autocomplete hint and named `$name` substitution.
 
@@ -77,11 +85,11 @@ Invocation is controlled from the skill's own frontmatter instead:
 
 The version lives in two files and they must not drift:
 
-- `.Codex-plugin/plugin.json`
-- `.Codex-plugin/marketplace.json`
+- `.claude-plugin/plugin.json`
+- `.claude-plugin/marketplace.json`
 
 Bump both, update the Skills table in `README.md`, then tag. The published marketplace entry lives
-in `ehartye/hartye-Codex-plugins` and is updated separately.
+in `ehartye/hartye-claude-plugins` and is updated separately.
 
 ## Git
 
