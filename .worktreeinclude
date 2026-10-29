@@ -1,0 +1,3 @@
+# Carry the project-level plugin selection into working copies the platform creates.
+# Only files that match a pattern and are also excluded from sharing are copied.
+.claude/settings.json
