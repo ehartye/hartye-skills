@@ -10,6 +10,7 @@ this file.
 - [Two contracts: spec vs Claude Code](#two-contracts-spec-vs-claude-code)
 - [The description listing cap](#the-description-listing-cap)
 - [The description contract is contested](#the-description-contract-is-contested)
+- [Causes outside the description](#causes-outside-the-description)
 - [Position and length](#position-and-length)
 - [Simultaneous constraints](#simultaneous-constraints)
 - [Net-negative skills and self-assessment](#net-negative-skills-and-self-assessment)
@@ -45,7 +46,7 @@ agentskills.io specification and the live Claude Code skills documentation.
   skill listings, and the command still comes from the directory name." In a **plugin** skill it
   "sets the last segment of the command and the plugin prefix stays in place" — so
   `my-plugin/skills/review/SKILL.md` with `name: fancy` becomes `/my-plugin:fancy`.
-- `description` is Recommended, not required; if omitted, the first paragraph of the body is used.
+- `description` is Recommended, not required; if omitted, the first non-empty line of the body is used.
 - Many more optional fields exist: `when_to_use`, `argument-hint`, `arguments`,
   `disable-model-invocation`, `user-invocable`, `allowed-tools`, `disallowed-tools`,
   `model`, `effort`, `context`, `agent`, `background`, `hooks`, `paths`, `shell`.
@@ -65,21 +66,51 @@ additional features like supporting files." Command files ignore `name` and `pat
 `commands/` wrapper around a skill is a redundant second definition of the same trigger.
 ## The description listing cap
 
-**Current value: 1,536 characters**, covering the combined `description` and `when_to_use` text in
-the skill listing. Claude Code emits a startup warning when a description is truncated. Source: the
-skills documentation frontmatter reference, and the changelog entry "raised the listing cap from
-250 to 1,536 characters and added a startup warning when descriptions are truncated."
+**Per entry: 1,536 characters by default**, covering the combined `description` and `when_to_use`
+text of one skill in the listing, "regardless of budget." It is a default: the setting
+`skillListingMaxDescChars` (a positive integer, default 1536) changes it. Source: the skills page
+and the settings reference, both captured 2026-10-28.
 
 **This number has already moved once**, and that history is the useful part. Changelog v2.1.86 set
 a 250-character cap; `anthropics/claude-code` issue #40121 documented it as undocumented and
-argued authors should front-load trigger words. A later entry raised it to 1,536. Guidance written
-against the 250 figure — including that issue, and secondary write-ups derived from it — describes
-superseded behavior.
+argued authors should front-load trigger words. v2.1.105 (April 13, 2026) "raised the listing cap
+from 250 to 1,536 characters and added a startup warning when descriptions are truncated"; v2.1.144
+(May 19, 2026) made truncation "no longer shown as a startup notification". Guidance written
+against 250, or against a startup warning, describes superseded behavior. Today the skills page says
+an over-budget listing "writes a warning to the debug log, visible with `--debug`."
 
-Separately and still current: `SLASH_COMMAND_TOOL_CHAR_BUDGET` governs the *aggregate* metadata
-budget across all installed skills, scaling dynamically at 2% of the context window with a 16,000
-character fallback. It is a different limit from the per-listing cap, and a large library can push
-descriptions out of the listing even when each is individually short.
+**Whole listing: 1% of the context window by default.** Sources, all [documented]:
+- Skills page, 2026-10-28: "The budget scales at 1% of the model's context window." "The listing
+  always contains every skill name, but if you have many skills, Claude Code drops some descriptions
+  ... When the listing overflows, Claude Code drops descriptions starting with the skills you invoke
+  least, so the skills you use most keep their full text."
+- Settings reference, 2026-10-28: `skillListingBudgetFraction`, a number above 0 and at most 1,
+  default `0.01`. Over the cap Claude Code "keeps every skill's name but drops the descriptions of
+  the least-used skills, so Claude can still invoke those skills but is less likely to choose one on
+  its own."
+- Raising it (skills page): the setting (for example `0.02` = 2%) "or the
+  `SLASH_COMMAND_TOOL_CHAR_BUDGET` environment variable to a fixed character count", the legacy
+  control. The 8,000-character fallback comes only from the environment variables page, captured
+  2026-10-15 and not re-captured: "scales dynamically at 1% of the context window, with a fallback
+  of 8,000 characters. Legacy name kept for backwards compatibility."
+- Freeing budget: `"name-only"` in `skillOverrides` lists a skill without its description.
+  "Plugin skills are not affected by `skillOverrides`. Manage those through `/plugin` instead."
+- History: v2.1.32 (February 5, 2026) set a 2% budget. No changelog entry through v2.1.312 records
+  the move to 1% (the page collapses long lists, so absence is not proof). Older guidance giving 2%
+  and a 16,000-character fallback is superseded; neither figure is in the current documentation.
+- `/doctor` gives "an estimate of the listing's context cost and its biggest contributors"; no page
+  says a command lists which descriptions were dropped.
+
+**UNSETTLED (documentation silent or conflicting; do not assert):**
+- When the 8,000-character fallback applies. It is worded against the legacy variable's row only.
+  One probe on Claude Code 2.1.310 never reached it: 5000 gave a 5,000-character budget, while
+  `abc` and 0 were ignored and the 1% default applied [tested, one run].
+- What "least invoked" ranks by (count, recency or both), where a never-invoked skill ranks, ties.
+  That a newly installed, never-invoked skill loses its description first is inference [general].
+- Whether the variable or the setting wins when both are set; how a fraction becomes characters.
+- Whether plugin, bundled or managed skills are subject to the drop.
+- Whether `/doctor` or `/skill-doctor` reports a dropped description or a per-entry cut.
+- Whether a subagent gets the same listing.
 
 The Agent Skills specification separately permits `description` up to 1024 characters — a third
 number, from the vendor-neutral spec rather than the implementation.
@@ -93,6 +124,12 @@ number itself.
 the 250 figure taken from issue #40121 without reconciling it against the documentation already
 available. A single source reporting a constraint is a claim about one point in time; a changelog
 is the record of whether it still holds.
+
+**Step 2 command [tested 2026-10-28, Git Bash]:** equals YAML-parser counts on 14 fixtures (plain, quoted,
+wrapped, folded, CRLF, non-ASCII, fenced body). It counts code points as the bytes that are not UTF-8
+continuation bytes, because `wc -m` there counts a 4-byte character as 2; a stray CR is stripped. Not decoded:
+escapes in quotes, `>+`. YAML validity is unchecked (the `yaml` package rejects an unquoted `: `). A `>` or `|`
+block counts its final newline. Unsettled: the join separator, that newline, UTF-16 units. Untested: other platforms.
 
 ## The description contract is contested
 
@@ -128,6 +165,35 @@ spec, put trigger phrases in `when_to_use` where the implementation supports it,
 description become a summary of the steps.
 
 All three agree on: the description is the triggering mechanism, and vagueness is fatal.
+
+## Causes outside the description
+
+Read 2026-10-28 on the skills page, settings reference and changelog. [tested]: measured on Claude
+Code 2.1.310, not in the documentation. UNTESTED and UNSETTLED: neither.
+
+- **Dropped or name-only [documented].** "The listing always contains every skill name, but if you
+  have many skills, Claude Code drops some descriptions"; `"name-only"` in `skillOverrides` lists a
+  name alone. Look: ask "What skills are available?"; `--debug` (a warning over budget); `/doctor`
+  (cost estimate and biggest contributors); `/context`; `/skill-doctor`. UNSETTLED: that any shows
+  which descriptions were dropped; whether a plugin skill can be dropped.
+- **`disable-model-invocation: true`:** "Description not in context" [documented]; the name leaves too [tested].
+- **Malformed YAML [documented].** "The skill still loads with no fields set"; `/skill-name` works
+  but Claude "can't match against your `description`"; `--debug` shows the parse error; `claude
+  plugin validate` on the skills directory finds it (v2.1.233 or later); frontmatter is read only
+  when the opening `---` is line 1. [tested]: `: ` in an unquoted value fails on CRLF only; ` #`
+  cuts the description on both; a whole-value `[list]` drops it; quoting or `>-` loads intact.
+- **Misspelled field [documented]:** "ignores a field it doesn't recognize without reporting an
+  error"; [tested] `claude plugin validate` does not report it.
+- **`paths` [documented].** Relative to the current working directory; a sibling git worktree does
+  not match, "even one you added with `/add-dir`"; start Claude Code there or `/cd`. A linked
+  worktree with no `.claude/skills` loads the main checkout's (v2.1.277 or later). UNTESTED: glob
+  syntax, nested worktrees. UNSETTLED: `paths` on a plugin skill (docs and one probe disagree).
+- **Refused name [documented].** Control, zero-width, private-use, direction-changing or odd blank
+  characters, `<`, `>`: outside a plugin the skill does not load. Debug log: `[names]`. UNTESTED:
+  a real plugin.
+- **Lifecycle [documented].** Invoked content is not re-read. Compaction re-attaches the newest
+  invocation of each skill: first 5,000 tokens each, 25,000 combined; older skills "can be dropped
+  entirely".
 
 ## Position and length
 
