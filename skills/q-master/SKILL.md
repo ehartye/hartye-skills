@@ -15,6 +15,10 @@ choosing tools inside a domain, for general settings changes, or for writing or 
 
 ## Procedure
 
+**Before you start:** list the files in `references/`. If one is named for your platform, read it
+now; it holds that platform's verified mechanics and what is untested. If none is, rely on your
+own knowledge of the platform and the wiki's notes, and say that no platform file covers it.
+
 Do the steps in order. Steps 1 to 4 only read.
 
 1. **Inventory first.** List what is installed (plugin, one-line purpose, skill count, MCP server
@@ -36,8 +40,10 @@ Do the steps in order. Steps 1 to 4 only read.
      specific disable is an exception that is honored and recorded with the user's reason; never
      lift it yourself, in this run or in any later audit.
    - Trim inside a plugin only if the wiki's notes on this platform's project-level enablement
-     (search the wiki for them) or the user tell you the trim takes effect and hides the item; your
-     own knowledge of the platform does not count. Otherwise the plugin is the unit: keep or drop
+     (search the wiki for them), a reference file for your platform, or the user tell you the trim
+     takes effect and hides the item; your own knowledge of the platform does not count. A platform
+     reference counts only when it gives a rule form flagged as tested to take effect and to hide
+     the item; a rule that only blocks a call is not a trim. Otherwise the plugin is the unit: keep or drop
      the whole plugin, and state what extra a kept plugin brings (its skill and tool count, and
      what it could misfire on). Wanting two skills of a large plugin is a case for this rule: say
      what the other skills add, then let the user choose keep or drop.
@@ -58,8 +64,9 @@ Do the steps in order. Steps 1 to 4 only read.
    create its overview first, as that skill requires.
 7. **Tell the user how the change takes effect.** Say it applies in sessions working in this
    project's directory: with a tool reload if the platform has one for this kind of change,
-   otherwise when the session is restarted. In this explanation name no command, setting or file;
-   the exact before and after in the proposal is the only place they appear. Do not try to verify
+   otherwise when the session is restarted. In this explanation name no setting or file, and name
+   a reload command only if your platform's reference gives it exactly; the exact before and after
+   in the proposal is the only place the file's content appears. Do not try to verify
    the effect from inside the current session; the next audit, in a fresh or reloaded session,
    compares the effective set with the note.
 
@@ -89,7 +96,7 @@ considered, and nothing is recorded twice.
 | Installing anything | Mark "needs install"; install only on an explicit request |
 | Changing or advising on user-level configuration | Project-level only |
 | Re-enabling a plugin the user specifically disabled, or switching off the always-on pair unasked | Honor and record a specific disable as an exception; otherwise the pair stays on |
-| Trimming inside a plugin without a wiki note or the user saying it takes effect | Keep or drop the whole plugin; state what it brings |
+| Trimming inside a plugin without a wiki note, a platform reference or the user saying it takes effect | Keep or drop the whole plugin; state what it brings |
 | Picking an engine, mesh route or other in-domain tool | Defer to the domain selection skill |
 | Describing the change loosely (update the config) | Show the exact before and after |
 | Writing an extra file nobody asked for | One enable and disable file, one note |
