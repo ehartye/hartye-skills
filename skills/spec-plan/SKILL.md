@@ -60,7 +60,12 @@ mode and in execution.
 8. **Open-decision gate.** The agent will not notice its own gaps, so list them. Every unknown
    becomes a question you ask now, a stated assumption, or a spike work package. The saved spec
    contains no question marks, no TBD or TODO, no "open questions" section, and no options left
-   for the planner to pick between.
+   for the planner to pick between. **Check each criterion against its artifact.** When a
+   criterion asserts the content of a page, table or file, open that artifact or its template
+   first and phrase the criterion at a level it can hold. Before saving, list each acceptance
+   criterion with the artifact it reads and one line on what that artifact holds, learned by
+   opening it or its template. A criterion with no such line is rewritten at a level the
+   artifact can hold, or removed.
 9. **Save it.** **REQUIRED:** Use wiki-master:wiki-author and the
    [spec template](references/spec-template.md). The spec is a backlog item at
    `wiki/authored/<project>/backlog/<slug>.md` with `kind: backlog-item` and
