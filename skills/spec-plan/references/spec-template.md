@@ -47,8 +47,9 @@ before planning. Leave out anything the user actually decided; that is a Decisio
 ## Constraints and pre-authorized actions
 Hard, checkable constraints only: the commands to build, test and run; the project structure the
 work must respect; one real code snippet showing the style to match; and Always, Ask first and
-Never boundaries. Name which outward-facing actions are pre-authorized and which are not. How
-changes are delivered follows the project's own guidelines, so do not restate it here.
+Never boundaries. Name which outward-facing actions are pre-authorized and which are not. Name
+the delivery steps that apply (branch, pull request, merge method, tag, downstream pins) and which
+are pre-authorized, taking the details from the project's own guidelines.
 
 ## Acceptance criteria
 Numbered. Each is a runnable command with its expected output, or an observation anyone can
@@ -71,6 +72,11 @@ Done when: <a command and its expected output>.
 ### Group B (after group A)
 **WP2: <name>.** Depends on: WP1. Owns: <files>.
 Brief: <...>. Done when: <...>.
+
+### Final group (delivery, after every other package)
+**WP-last: Deliver.** Depends on: every other WP. Owns: <none beyond the delivery steps>.
+Brief: the delivery steps from Constraints that apply, in order, running only those
+pre-authorized. Done when: <a command and its expected output>.
 
 ## Verification
 How a fresh session runs everything end to end: the acceptance commands in order, and where each

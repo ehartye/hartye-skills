@@ -11,11 +11,19 @@ Shorthand for the commit → branch → push → PR → merge → sync loop. Eve
 already satisfied, so it is safe to run at any point in the loop, including twice in a row.
 
 **Core principle:** cheap and reversible steps run unattended; the two that aren't — moving the
-default branch, and merging — always confirm first.
+default branch, and merging — confirm first. Moving commits off the default branch, and `--admin`,
+confirm every time. Merging confirms every time unless the user approves it for the session.
 
 ## The Pipeline
 
 Run in order. Any step that reports **stop** ends the run: state where it got to and what remains.
+
+**Session approval.** Before the first gated step, once a merge — or a project-defined release
+packaging or tagging step — is coming, ask one question with the structured-question tool and two
+answers: treat those steps as approved for the rest of the session, or re-ask each time. Skip it if
+the user has already stated the answer in this session. The answer lives in the conversation only;
+nothing is written to disk. It never covers moving commits off the default branch or `--admin`, and
+`BLOCKED` and `DIRTY` still stop.
 
 ### 1. Orient
 
@@ -86,7 +94,8 @@ gh pr create --fill --base <default>
 
 ### 6. Review
 
-Print, then ask — browser, merge, or stop:
+Print, then ask — browser, merge, or stop. If merging is approved for the session, print and go
+straight to 7:
 
 ```bash
 gh pr view --json number,title,url,additions,deletions,changedFiles
@@ -162,4 +171,5 @@ Noticing any of these means the pipeline has drifted into doing harm. Stop and r
 | Deleting the branch without checking the PR merged | A failed merge plus a branch delete *closes* the PR — assert `state == MERGED` first |
 | Treating `BLOCKED` as something to work around | Protection is a decision someone made; report it and let the user choose `--admin` |
 | Reading `mergeStateStatus` once, right after creating the PR | It is `UNKNOWN` for the first few seconds — poll, or the check silently passes everything |
+| Merging, packaging or tagging without asking, on an approval nobody gave | Ask the session question first; no answer means re-ask each time |
 | Reporting "shipped" after a stop | Name the step reached and what is left |
