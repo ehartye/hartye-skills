@@ -28,7 +28,9 @@ mode and in execution.
    five or more**: if you have more, ask the ones that change the spec most and hold the rest for
    the next batch. Give each a recommended default, using your structured-question tool if one exists. Cover: goal and the
    outcome a user can see; scope and non-goals; hard constraints; how acceptance is checked;
-   build or spike; and which outward-facing actions are pre-authorized and which are not. Draft
+   build or spike; the project's release and repo procedure (branch, pull request, merge method,
+   tag, downstream pins) and which of those steps are pre-authorized; and which other
+   outward-facing actions are pre-authorized and which are not. Draft
    nothing until the first batch is answered. If the user says to decide for them, record your
    defaults as assumptions. Find the project from the repository through the overview's `repo:`
    field; if that fails, ask for the project slug.
@@ -71,21 +73,28 @@ mode and in execution.
    `wiki/authored/<project>/backlog/<slug>.md` with `kind: backlog-item` and
    `backlog-status: planned`, so the roadmap lists it with no extra step. Write acceptance as a
    runnable command with its expected output, or an observation anyone can repeat. Write
-   at the altitude of outcomes and design; the planner chooses the technical steps.
+   at the altitude of outcomes and design; the planner chooses the technical steps. Record the
+   release and repo procedure from the interview as a final delivery work package that depends on
+   every other package, so merge, tag and pins are in the plan rather than left outside it.
 10. **Close the interview** with exactly: "When you're ready, tell me `/plan the spec`." That
     line is the last thing the reply says: nothing follows it, no summary, no assumptions list, no
-    wiki commands. Put anything the user should see before it.
+    wiki commands. Put anything the user should see before it, and when other specs are queued
+    (Stage 2 step 1), say how many.
 
 ## Stage 2: Plan (planning mode)
 
-1. **Find the spec** from the conversation. Failing that, take the project's most recently updated
-   backlog item that has a `## For the planner` section and status planned or in-progress. The
-   plan's first line states which spec it chose.
+1. **Find the spec.** A queued spec is a backlog item with a `## For the planner` section and
+   status planned or in-progress. If the user names a spec, use it. If exactly one is queued, use
+   it. If several are, before writing the plan ask a multi-select question with your
+   structured-question tool, offering the four most recently updated and letting the user name
+   another. Picked specs run in the order picked, one after another, each with its own parallel
+   groups. The plan's first line names the specs in order.
 2. **One work package is one plan step.** Keep the spec's parallel groups and carry each brief
    verbatim, with its owned files and done-when. Add the spec's Setup and Verification steps as
    its For the planner section directs, and add no step the spec does not contain.
 3. **No questions, and no options.** The plan asks nothing, presents no alternatives and carries
-   no ceremonial phases. If you find a gap, say which section has it and return to Stage 1.
+   no ceremonial phases. This governs the plan's content; the step 1 picker runs before the plan
+   exists. If you find a gap, say which section has it and return to Stage 1.
 4. **Carry the execution rules into the plan.** Its closing lines restate, so they survive
    approval: a fresh verifier, never the builder, runs the acceptance commands; one repair
    attempt by a fresh subagent, then record the failure and stop; at most three subagents at
@@ -115,6 +124,10 @@ mode and in execution.
 8. **No subagent facility?** Run the same work packages one after another in group order, keep
    each report just as short, and run verification last, against the acceptance criteria rather
    than your own notes.
+9. **End with an interview over what is still outstanding.** Use a structured-question tool: give
+   each item its context, its options and a recommendation where there is one, so the user
+   decides in the moment. Do not close with a list of follow-ups. With no question tool, ask in
+   plain text in the same shape.
 
 ## Red flags
 
@@ -130,6 +143,7 @@ mode and in execution.
 | The orchestrator reading files a subagent should read | Delegate; keep the reports |
 | The builder grading its own work | A fresh verifier runs the acceptance commands |
 | Work packages that overlap on files, or need a long chat to understand | One owner per file; a brief that stands alone |
+| Ending an execution with a list of follow-ups | Ask about each outstanding item, with options and a recommendation |
 
 ## Evidence
 
