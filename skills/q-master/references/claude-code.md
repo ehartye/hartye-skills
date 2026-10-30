@@ -25,7 +25,10 @@ state an UNTESTED or UNKNOWN fact as settled; say which it is.
 
 `<name>@<marketplace>`, as listed. A plugin synced from the user's claude.ai account is
 `<name>@synced`. A project entry `"<name>@synced": false` in the shared file controls it.
-DOCUMENTED, UNTESTED: propose it and say it is documented and not yet verified. The
+DOCUMENTED. OBSERVED 2026-10-30 on Claude Code 2.1.314, two synced plugins, one run: with the key
+set to false in the shared project file, the platform's plugin listing, run from the project,
+showed each as project-scope disabled. The effect on an already-running session was not checked.
+Propose it and say it was observed once, not tested under control. The
 local file for `@synced` ids and a project-scoped plugin-disable command for them are UNKNOWN. The
 account toggle, a user-level disable and the machine-wide sync setting are user-level: not Q's to
 change or recommend.
