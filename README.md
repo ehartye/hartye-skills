@@ -45,7 +45,7 @@ For local development against this checkout:
 | [q-master](skills/q-master/SKILL.md) | You are starting or joining a project, or its tools feel crowded, and want the smallest sensible set of plugins enabled. Audits what is enabled against what is installed and records the selection and rationale in a wiki note. |
 | [rubber-duck](skills/rubber-duck/SKILL.md) | You want a second opinion that is not just you again — stuck, pre-commitment on something hard to reverse, or asked to sanity check or red-team. Consults the other vendor's model and records it verbatim to `docs/rubber-duck/`. |
 | [ship-it](skills/ship-it/SKILL.md) | You want pending work committed, pushed, PR'd and squash-merged in one step — including when it's sitting on the default branch. |
-| [spec-plan](skills/spec-plan/SKILL.md) | You want a feature, change or spike specced before it is built: an interview, a wiki search, and a spec saved on the project roadmap that plan mode turns into a question-free plan. Execution runs the work in parallel subagents. |
+| [spec-plan](skills/spec-plan/SKILL.md) | You want a feature, change or spike specced before it is built: an interview, a wiki search, and a spec saved on the project roadmap that plan mode turns into a question-free plan. Execution runs the work in parallel subagents. Ask for an enhanced mode and independent reviewers check the spec, each work package and the whole result; a spec can also list recommended tools, the project's plugins and skills, for each work package. |
 | [yoda](skills/yoda/SKILL.md) | Writing, editing, or reviewing a SKILL.md, or auditing a skill library — including when a skill never fires, fires but is ignored, or competes with another. |
 
 ## Layout
