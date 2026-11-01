@@ -29,7 +29,8 @@ review and final review. Each can also be adopted alone in a standard spec.
 
 **Independent** means a fresh subagent started for that review alone: never continued by message,
 never the author or builder of what it reviews, never the orchestrator, never reused. The final
-reviewer is also distinct from every package reviewer and from the verifier. It is given the
+reviewer is also distinct from the orchestrator, every builder, every package reviewer and the
+verifier. It is given the
 artifacts and the spec's relevant parts, never the builder's report or reasoning.
 
 A reviewer does three jobs. **Code review:** correctness, regressions, and the style the spec
@@ -41,8 +42,8 @@ reviewer edits nothing in the artifact.
 A reviewer returns at most 150 words: PASS or FAIL, then each finding with evidence, a file and
 line or a command and its output. A finding without evidence does not block; it goes into Results
 as advisory. Reviewers count toward the cap of three subagents at once, and only the verifier
-marks criteria. With no subagent facility, say in one line before saving that enhanced cannot run
-independently, and record standard.
+marks criteria. With no subagent facility, say in one line, before the spec review is dispatched or, when none is in force, before step 10
+closes the interview, that enhanced cannot run independently, and record standard.
 
 ## Stage 1: Spec
 
@@ -82,14 +83,16 @@ independently, and record standard.
 
    The exploration subagent also reads the skills and plugins visible to the session, the
    project's enabled set, and the wiki's notes on the project's tooling if there are any, and
-   returns the tools that fit the work. Propose a short list, each with a one-line reason and the
-   packages that use it, as a structured question in an interview batch (still two to four
-   questions); the user confirms or trims it. Record only confirmed tools. When none fits, say
-   nothing about tools.
+   returns the tools that fit the work. Propose every tool that fits, not only the best one, as
+   ONE structured question (a multi-select with a recommended default), each tool with a
+   one-line reason and the packages that use it; the user confirms or trims the list in one
+   answer. It counts as one question in the interview batch (still two to four questions, never
+   five or more). Record only confirmed tools. When none fits, say nothing about tools.
 
-   After exploration and before saving, for each part that is especially high risk or complex,
-   suggest the fitting review element as one structured question per cluster, with a
-   recommendation. The parts that qualify: an action hard to reverse or outward-facing
+   After exploration, and before the spec review is dispatched or, when none is in force, before
+   step 10 closes the interview, for each part that is especially high risk or complex,
+   suggest the fitting review element in one structured question that names each qualifying
+   package with the element suggested for it, with a recommendation for each. The parts that qualify: an action hard to reverse or outward-facing
    (delivery, deletion, migration, publishing); security, permission or data-handling changes; a
    shared contract many things depend on (public interface, schema, config format); a package
    spanning many files or needing care over order or concurrency; a spike whose verdict gates a
@@ -122,19 +125,28 @@ independently, and record standard.
    outcome. It has a Recommended tools section when any tool was confirmed, and a Tools line on
    each package that uses one.
 
-   **Before saving**, if the review-element suggestion or the recommended-tools proposal has not
-   yet been made for this spec, whether or not step 6 has passed, make it now in an interview
-   batch (two to four questions, a recommended default each), and record the answers in the Review
-   mode and Recommended tools sections. A part that does not qualify, or no tool that fits, still
-   means saying nothing.
+   **Settle review and tools before the review.** Before the spec review is dispatched or, when
+   none is in force, before step 10 closes the interview, check whether each of two things has
+   already been put to the user for this spec: the review-element suggestion and the
+   recommended-tools proposal from step 6. Put each one that has not, whether or not step 6 has
+   run, in one interview batch of two to four questions (never five or more) with a recommended
+   default each. The review suggestion is ONE question, and the recommended-tools proposal is
+   ONE structured question listing every tool that fits the work, not only the best one, each
+   with its one-line reason and the packages that use it, so the user confirms or trims the
+   list in one answer; each counts as one question toward the batch limit. Never put one a second time, including one the user
+   declined. Record an accepted element under Review mode, a declined one as declined, and a
+   confirmed tool under Recommended tools. A part that does not qualify, or a tool that does not
+   fit, is not put to the user and is not recorded. Where the answers change an already saved
+   spec, amend the saved page.
 
    **Spec review**, when in force, runs after the save and before step 10. Save the draft to the
    wiki at its final path first and review it in place; a draft in the wiki during review is
    acceptable. A fresh reviewer receives the user's request, the interview questions and answers,
-   and the path of the saved draft. Its three jobs for a spec: check the spec's claims about the
-   codebase against the code; check that every user decision is present and none is contradicted
-   or invented; and run the acceptance commands that can run before the build, confirming each
-   baseline fails for the stated reason and each other command is runnable. The author fixes
+   and the path of the saved draft. Its brief names the three jobs by the labels under Review
+   mode. **Code review:** check the spec's claims about the codebase against the code. **Spec
+   adherence:** check that every user decision is present and none is contradicted or invented.
+   **Independent testing:** run the acceptance commands that can run before the build, confirming
+   each baseline fails for the stated reason and each other command is runnable. The author fixes
    confirmed findings, a fresh reviewer re-checks once, and anything still open becomes a
    question in a further batch. The saved spec records that spec review ran and its outcome.
 10. **Close the interview** with exactly: "When you're ready, tell me `/plan the spec`." That
@@ -196,8 +208,9 @@ independently, and record standard.
    verifier's result marks a criterion passed; nobody but the user edits the criteria.
 
    **Final review**, when in force: after every non-delivery package has passed review and the
-   verifier has passed, and before the delivery package starts, a fresh final reviewer reviews the
-   whole result against the Goal, Scope and non-goals, and the acceptance criteria: how the
+   verifier has passed, and before the delivery package starts, a fresh final reviewer, whose dispatch
+   states that it is distinct from the orchestrator, every builder, every package reviewer and
+   the verifier, reviews the whole result against the Goal, Scope and non-goals, and the acceptance criteria: how the
    packages fit together, files changed outside any owner, the diff staying confined. A failure
    gets one repair per finding by a fresh subagent and a fresh final reviewer. A second failure is
    recorded in Results, delivery does not start, and the work is not reported complete. For a
