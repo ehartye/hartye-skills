@@ -13,20 +13,20 @@ are available. Implementation belongs to the subsequent workflow, so finish at h
 
 ## Prerequisites
 
-Start with wiki-master available and the host outside plan mode, so the skill can ground and
-save its artifacts. If either prerequisite is unmet, stop the skill and tell the user which
-conditions apply: wiki-master is unavailable, plan mode is active, or both. Explain that they
-can invoke the skill again once wiki-master is available and they have left plan mode.
+Use wiki-master in both stages to ground the work. Create and update specs outside the host's
+plan mode so they can be saved. Plan ready specs inside the host's plan mode so planning stays
+separate from implementation. If wiki-master is unavailable or the host is in the wrong mode
+for the requested stage, stop that stage and explain what must change before resuming.
 
 ## Rigor
 
 Accept `rigor=standard` or `rigor=enhanced` anywhere in the arguments; the remainder is the
 request. Carry the selected rigor from the spec into the plan unless the user changes it.
-When it is unspecified, ask in the first interview batch, recommending standard for routine
-work. **Standard** uses the spec and plan procedures below. **Enhanced** adds the fresh-agent
+For a new spec, default to `rigor=standard` when omitted and record it without asking the user.
+**Standard** uses the spec and plan procedures below. **Enhanced** adds the fresh-agent
 spec review and the planned work-package reviews described in their respective sections.
 The user may select either enhancement individually; record the selection and its reason.
-For a batch, use the requested rigor as the default for new specs and record any per-spec
+For a batch, use the requested rigor or the standard default for new specs and record any per-spec
 choices. Preserve each saved spec's rigor when planning a set unless the user changes it.
 
 ## Stage 1: Spec
@@ -46,7 +46,7 @@ order them without relying on conversation memory.
    the conversation. Ask remaining questions in small batches of two to four, or fewer when
    fewer remain or the question tool has a lower limit. Give recommended defaults. Cover the
    goal and user-visible outcome, scope, constraints, acceptance, build versus spike, and
-   applicable delivery requirements and authorization. Include the rigor choice when needed.
+   applicable delivery requirements and authorization. Record the default or requested rigor.
    Wait for answers before drafting dependent content; when the user delegates a choice,
    record the chosen default as an assumption. Small batches make decisions easier to answer.
 3. **Ground the request in the wiki.** Find the project through its overview's `repo:` field;
@@ -139,12 +139,14 @@ use "When you're ready, tell me `/plan the ready specs`, or name the specs you w
    handoff conditions against the current repository. A saved draft or planned status alone
    establishes neither settled decisions nor a passed review. Report pending candidates and
    their reasons separately. For an explicitly requested spec with gaps or an affected review,
-   return to Stage 1 to settle it before including it in the final plan. For in-progress specs,
-   establish the remaining scope from recorded results and preserve ongoing work.
+   return to Stage 1 outside plan mode to settle and save it before resuming planning in plan
+   mode. For in-progress specs, establish the remaining scope from recorded results and
+   preserve ongoing work.
 2. **Reconcile the selected set.** Resolve cross-spec contradictions, dependency cycles,
-   missing prerequisites and shared-interface decisions through the spec interview, updating
-   affected specs and reviews before handoff. A prerequisite may be an already verified result
-   or another selected ready spec with a settled output contract. A build decision depending
+   missing prerequisites and shared-interface decisions through Stage 1 outside plan mode,
+   updating affected specs and reviews before resuming planning in plan mode. A prerequisite
+   may be an already verified result or another selected ready spec with a settled output
+   contract. A build decision depending
    on an unresolved spike waits for its verdict. Produce one combined plan with a section per
    spec, in the user's selected order where dependencies permit; state any required reordering.
    Keep specs sequential, with parallel groups inside each spec, so later work can account
@@ -168,7 +170,8 @@ use "When you're ready, tell me `/plan the ready specs`, or name the specs you w
    spec's acceptance criteria, settled constraints and selected rigor. Apply the same decision and
    spike checks from Spec handoff to the resulting plan, so each package can begin with its
    execution-informing decisions settled. Present the plan in the
-   reply or the project's designated plan artifact. End with
+   reply using the host's plan format, or a designated plan artifact the host permits writing
+   in plan mode. End with
    "The spec and plan are ready for handoff," or "The selected specs and combined plan are
    ready for handoff." This completes the skill's scope; the saved specs remain available
    for later use and their backlog status stays unchanged by planning.
