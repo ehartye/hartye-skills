@@ -1,8 +1,12 @@
 # Spec template
 
-Save as `wiki/authored/<project>/backlog/<slug>.md`. Each section's note says what belongs and what
-to leave out; delete the note, and any section with nothing to say. The finished spec has no
-questions, no TBD, no TODO and no NEEDS CLARIFICATION.
+Save as `wiki/authored/<project>/backlog/<slug>.md`. Replace guidance with settled content,
+keeping the sections that help a fresh planner understand the goal and make a concrete plan.
+Before handoff, settle decisions about scope, behavior, interfaces, dependencies, acceptance
+and authorization, and record them as statements. Replace placeholders and open questions with
+settled choices; leave routine implementation details within those choices to the implementer.
+For multiple goals, save one spec per goal in the same backlog. Each spec retains its own
+decisions, rigor and acceptance criteria so it can be planned alone or in a selected set.
 
 ```markdown
 ---
@@ -19,126 +23,122 @@ backlog-status: planned
 # <Imperative title: what changes for the user>
 
 ## Goal
-Open here: the goal and the outcome a user can see, in a few sentences. State the spec's level
-and lifetime (written before building and discarded after, kept alongside the code, or the
-standing source of truth) and mark what is existing behavior and what is new. Leave out history.
+State the goal and the user-visible outcome. Distinguish existing behavior from the change.
+State the spec's intended lifetime: a planning input, a maintained companion to the code,
+or the standing source of truth.
 
-## Review mode
-The mode and the review elements in force, any element the user declined, and the outcome of the
-spec review. Omit the section for a standard spec with no elements.
+## Rigor
+Rigor: <standard | enhanced>
+Spec review: <selected | not selected>; outcome: <pending | passed, with evidence>
+Planned work-package review: <all packages | selected WP ids | not selected>
+Stage-specific choices: <accepted or declined enhancements and the user's reason, if any>
 
-Mode: <standard | enhanced>
-Review elements: <spec review, package review (every package except delivery, or the WP ids), final review; or none>
-Declined: <elements the user declined, or none>
-Spec review: <ran, with its outcome | not in force>
+Enhanced selects both enhancements. Record the actual spec-review outcome before handoff;
+the plan carries work-package reviews as future review steps.
 
 ## Context
-Only what the planner cannot discover from the code or the wiki: the evidence pages, the
-decision that makes this non-obvious, links to related notes. Leave out orientation it can read
-for itself.
+Record relevant evidence and non-obvious design context, with source links, so the planner
+can distinguish established facts from assumptions.
 
 ## Scope and non-goals
-In scope as a short list, then non-goals. Related items that are out of scope go here as links.
-Leave out anything nobody would plausibly assume is in scope.
+State the included outcomes and plausible adjacent work outside this change. Link related
+roadmap items that remain separate.
 
 ## Absorbed and related items
-Each roadmap item the work absorbs, as a link with the one line `Specced in [[<this spec>]]
-(WP-n)`; each related item left alone, with a reason. Omit if there are none.
+Link absorbed items to their work packages. Each absorbed roadmap entry points here with
+`Specced in [[<this spec>]] (WP-n)` so it remains discoverable.
 
 ## Decisions
-Numbered, each with the choice made and the reason in a clause. These are settled; the planner
-does not reopen them. Leave out options that were considered and dropped.
+List each settled choice with its reason. These decisions let planning focus on concrete steps.
+
+## Dependencies
+Link prerequisite specs and name the required outcomes or settled interface contracts. Identify
+already verified prerequisite results where applicable. Include this section when dependencies
+exist. Findings from an unresolved spike inform a later build spec and plan after its verdict.
 
 ## Assumptions
-Things taken as true because the user gave no answer, each stated so the user can correct it
-before planning. Leave out anything the user actually decided; that is a Decision.
+Record user-delegated choices explicitly so the user can correct them before the plan depends
+on them. Resolve execution-informing decisions through the interview or a defined spike.
 
-## Constraints and pre-authorized actions
-Hard, checkable constraints only: the commands to build, test and run; the project structure the
-work must respect; one real code snippet showing the style to match; and Always, Ask first and
-Never boundaries. Name which outward-facing actions are pre-authorized and which are not. Name
-the delivery steps that apply (branch, pull request, merge method, tag, downstream pins) and which
-are pre-authorized, taking the details from the project's own guidelines.
+## Constraints and authorization
+Record checkable constraints, relevant commands, interfaces, project conventions and a real
+code-style example where useful. Carry forward the project's delivery procedure and the
+user's authorization boundaries so the plan can accurately describe any delivery package.
 
 ## Recommended tools
-The plugins and skills available in the project that fit the work, confirmed by the user, each as
-`<name as the project lists it> - <one-line reason>; used by <WP ids>`. Tools are advisory: a
-package may do without them. Omit the section when none fits.
+List user-confirmed tools as `<name> — <reason>; used by <WP ids>`. These inform the plan's
+package briefs. Include this section when tools have been selected.
 
 ## Acceptance criteria
-Numbered. Each is a runnable command with its expected output, or an observation anyone can
-repeat, per milestone where there are several. Include at least one negative test and name the
-full suite. Leave out adjectives ("clean", "fast") with no check behind them. Only the independent
-verifier marks a criterion passed; the executor does not edit the criteria.
+Number observable outcomes, each with a runnable command and expected output or a repeatable
+observation. Identify the artifact each criterion reads and what it can show. Distinguish
+existing baseline checks from checks requiring future work. Include relevant failure cases
+and the appropriate project validation commands.
 
 ## Work packages
-Group by context boundary, not by role. One loop of work each, independently verifiable, with a
-stop-and-fix rule: if the done-when fails, repair once and stop. Each file has exactly one owner,
-and a package is self-contained, readable without the rest of the spec. Start with one agent for
-a small change, and plan no more than three at once. Leave out granular technical steps the
-planner can choose better than the spec can.
+Group by context boundary. Give each package a self-contained brief, explicit dependencies,
+file ownership and a checkable result. Independent packages with disjoint ownership can be
+planned in parallel; shared-file changes need an explicit sequence.
 
-### Group A (independent, run together)
+### Group A — independent
 **WP1: <name>.** Depends on: <none | WP ids>. Owns: <files or directories>.
-Brief: <everything the subagent needs, with the goal, inputs, constraints and what to return>.
-Done when: <a command and its expected output>.
-Tools: <names from Recommended tools, or none>. (optional line)
+Brief: <goal, inputs, interfaces, constraints and expected artifacts>.
+Done when: <command and expected output, or repeatable observation>.
+Tools: <confirmed tools, when applicable>.
 
-A package marked for review has its plan step carry "then reviewed".
+### Group B — after its dependencies
+**WP2: <name>.** Depends on: WP1. Owns: <files or directories>.
+Brief: <self-contained brief>. Done when: <observable result>.
 
-### Group B (after group A)
-**WP2: <name>.** Depends on: WP1. Owns: <files>.
-Brief: <...>. Done when: <...>.
-
-### Final group (delivery, after every other package)
-**WP-last: Deliver.** Depends on: every other WP. Owns: <none beyond the delivery steps>.
-Brief: the delivery steps from Constraints that apply, in order, running only those
-pre-authorized. Done when: <a command and its expected output>.
+### Delivery — when required by the scope
+**WP-last: Deliver.** Depends on: <required WP ids>.
+Brief: <project-specific delivery requirements and authorization boundaries>.
+Done when: <observable delivery outcome>.
 
 ## Verification
-How a fresh session runs everything end to end: the acceptance commands in order, and where each
-command and its output are recorded. State that a failure not fixed is recorded as failing, and the
-work is not reported complete while a named criterion fails. A verifier subagent runs this, never
-the builder.
+Describe how the eventual result will be checked against acceptance, including integration
+checks and relevant negative cases. This is input to the plan's verification steps.
 
 ## For the planner
-Plan hooks, as a short list: one plan step per work package plus Setup, in the groups above, with
-briefs carried verbatim; which step sets the status and which runs Verification; when the final review is in force, a Final
-review step between Verification and delivery; that approval
-of the plan is the go signal; that a blocked package is recorded in Results and the rest continue;
-that the orchestrator keeps only the subagents' short reports.
-
-## Results
-Not started. Execution turns this into the progress and decision log: what ran, each command
-and its output, decisions made, failures, and the link to the delivered change.
+Carry the package briefs, ownership, dependencies, done-when checks and confirmed tools into
+the plan. Default to subagents for parallel independent work and context preservation, with
+concise reports to the orchestrator; state the reason for any exception. Add the selected
+fresh-agent work-package reviews after package work and before dependent work (before the
+outward-facing action for delivery). Apply the same decision-completeness check to the plan
+before handoff so a fresh agent can begin every package with those decisions settled.
+When selected with other specs, retain this spec's rigor and acceptance criteria in its own
+section of the combined plan. Qualify package IDs as `<spec-slug>/WP-n`, reconcile dependencies
+and shared interfaces across the set, and sequence specs in dependency-compatible selection
+order, with parallel groups inside each spec. Recheck readiness from the saved content and
+review outcome against the current repository when planning begins.
 ```
 
 ## Spike variant
 
-Use when only an experiment can answer an unknown. A spike spec keeps Goal, Review mode, Context,
-Scope and non-goals, Assumptions, Constraints, Recommended tools, Verification, For the planner and
-Results, and replaces the middle:
+Keep the same grounding, Rigor, dependencies and planner handoff sections. Replace build outcomes and work
+packages with the following experimental design, so planning has a defined decision to support.
 
 ```markdown
-## Question
-Each unknown as Given / When / Then with an observable result, ordered by risk, riskiest first.
+## Questions to investigate
+State each unknown as Given / When / Then with an observable result, ordered by risk.
 
 ## Budget
-Only an effort budget the user gave, in their words. Otherwise: "no timebox; stops at the first
-met exit criterion". Do not invent one.
+Use the user's stated effort budget. Otherwise: "no timebox; stops at the first met exit criterion".
 
 ## Exploratory work packages
-The same fields as above. Throwaway code lives somewhere that is never delivered, and each
-package says where. Leave out production-quality work.
+Use the same brief, dependency, ownership and done-when fields. Name the disposable experiment
+artifacts, the settled experimental method and the evidence each package should produce.
 
 ## Exit criteria
-- **Validated:** the observable result held. Deliverable: <the finding and the evidence>.
-  Promote when <criterion>: it becomes a build spec.
-- **Partial:** some held. Deliverable: <what held, what did not, the smallest next experiment>.
-  Promote or discard by <criterion>.
-- **Invalidated:** the result did not hold. Deliverable: <the evidence and the options that
-  remain>. Discard the experiment.
+- **Validated:** <observable result>; deliverable: <finding and evidence>; promote when <criterion>.
+- **Partial:** <what held and what remains>; deliverable: <evidence and smallest next experiment>;
+  promote or discard according to <criterion>.
+- **Invalidated:** <observable result>; deliverable: <evidence and remaining possibilities>;
+  discard according to <criterion>.
 ```
 
-Execution stops at the first met exit criterion, records the verdict in Results, and recommends
-promote or discard.
+Specify which observable condition ends the experiment and how its verdict informs the next
+decision. Investigatory questions belong in the spike; its method, observable outcomes and
+exit criteria are settled before handoff. When findings determine a later build decision,
+plan the spike first and complete the affected build plan after its verdict. The spike spec
+and its plan are the deliverables of this skill.
