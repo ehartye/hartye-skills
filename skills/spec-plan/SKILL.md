@@ -17,6 +17,8 @@ Use wiki-master in both stages to ground the work. Create and update specs outsi
 plan mode so they can be saved. Plan ready specs inside the host's plan mode so planning stays
 separate from implementation. If wiki-master is unavailable or the host is in the wrong mode
 for the requested stage, stop that stage and explain what must change before resuming.
+Check the mode for the stage being performed, not the next stage at handoff. Finishing a
+spec in Default mode is expected; it does not block handing it off to `/plan`.
 
 ## Rigor
 
@@ -130,6 +132,9 @@ Link the saved specs and summarize each scope and whether it is ready for planni
 any draft still awaiting a decision or review separately; readiness follows from these checks,
 not a new backlog status. Close with "When you're ready, tell me `/plan the spec`." For a set,
 use "When you're ready, tell me `/plan the ready specs`, or name the specs you want planned."
+Where `/plan` enters the host's Plan mode, that command is the complete next action. Do not
+prepend a separate instruction to switch modes or describe the current Default mode as a
+blocker to this handoff. Check Stage 2's mode prerequisite when planning actually begins.
 
 ## Stage 2: Plan
 
