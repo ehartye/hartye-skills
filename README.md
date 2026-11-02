@@ -30,7 +30,7 @@ Via the `hartye-plugins` marketplace:
 For local development against this checkout:
 
 ```
-/plugin marketplace add C:\Users\ehart\repos\hartye-skills
+/plugin marketplace add /absolute/path/to/hartye-skills
 /plugin install hartye-skills@hartye-skills-dev
 ```
 
@@ -38,11 +38,13 @@ For local development against this checkout:
 
 <!-- Keep this table in sync as skills are added. -->
 
+Wiki-backed skills target wiki-master 0.89.0 or later and its six-role catalog.
+
 | Skill | Use when |
 | ----- | -------- |
 | [ask-me](skills/ask-me/SKILL.md) | You are offering a free moment, or want the agent to ask you what it is waiting on. Groups pending decisions with context and recommendations, waits for each submitted answer, and supports multiple selections through native controls or text. |
 | [beautiful](skills/beautiful/SKILL.md) | Building or reshaping any user-facing interface, or a design reads as templated and AI-generated. Covers aesthetic direction, typography, palette, layout, motion, and interface copy. |
-| [q-master](skills/q-master/SKILL.md) | You are starting or joining a project, or its tools feel crowded, and want the smallest sensible set of plugins enabled. Audits what is enabled against what is installed and records the selection and rationale in a wiki note. |
+| [q-master](skills/q-master/SKILL.md) | You are starting or joining a project, or its tools feel crowded, and want the smallest sensible set of plugins enabled. Audits what is enabled against what is installed and records the selection and rationale in a wiki note through wiki-project. |
 | [rubber-duck](skills/rubber-duck/SKILL.md) | You want a second opinion that is not just you again — stuck, pre-commitment on something hard to reverse, or asked to sanity check or red-team. Consults the other vendor's model and records it verbatim to `docs/rubber-duck/`. |
 | [ship-it](skills/ship-it/SKILL.md) | You want pending work committed, pushed, PR'd and squash-merged in one step — including when it's sitting on the default branch. |
 | [spec-plan](skills/spec-plan/SKILL.md) | You want to preload one or more wiki-grounded specs outside Plan mode, then plan a selected set of ready specs together in Plan mode. Rigor defaults to standard without a question. Use `rigor=enhanced` for fresh-agent spec review, a TDD task immediately before each development task with the same developer owning both, and planned fresh-agent work-package reviews, retained per spec. Combined plans sequence specs and use parallel subagents within each spec to preserve orchestrator context; the skill finishes at handoff. Where `/plan` enters Plan mode, the handoff gives that command as the single next action. |
