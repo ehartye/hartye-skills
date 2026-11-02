@@ -58,7 +58,7 @@ Do the steps in order. Steps 1 to 4 only read.
    for a single project. Merge into what is there, keep unrelated settings, and make exactly the
    approved change. Create no other file. Never touch or recommend changes to user-level
    configuration.
-6. **Record.** **REQUIRED:** Use wiki-master:wiki-author and the
+6. **Record.** **REQUIRED:** Use wiki-master:wiki-user in authoring mode and the
    [note template](references/note-template.md). Write `wiki/authored/<project>/notes/project-tooling.md`
    (`kind: note`) and edit it in place on every later run. If the project has no wiki entry,
    create its overview first, as that skill requires.
