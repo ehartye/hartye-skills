@@ -90,3 +90,7 @@ which takes precedence for that skill:
 Apache 2.0 is compatible with this repo, but it is not MIT: it obliges us to ship the license text,
 retain attribution, and state our changes. Any future skill derived from third-party work follows
 the same pattern — license file plus `NOTICE` in its own directory, and a row here.
+
+## Wiki integration compatibility
+
+Version 0.9.2 migrates spec-plan and q-master to the five wiki-master roles and requires wiki-master 0.88.0 or later for those workflows.
