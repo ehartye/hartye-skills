@@ -24,7 +24,8 @@ Accept `rigor=standard` or `rigor=enhanced` anywhere in the arguments; the remai
 request. Carry the selected rigor from the spec into the plan unless the user changes it.
 For a new spec, default to `rigor=standard` when omitted and record it without asking the user.
 **Standard** uses the spec and plan procedures below. **Enhanced** adds the fresh-agent
-spec review and the planned work-package reviews described in their respective sections.
+spec review and enhanced planning (test-driven development tasks and work-package reviews)
+described in their respective sections.
 The user may select either enhancement individually; record the selection and its reason.
 For a batch, use the requested rigor or the standard default for new specs and record any per-spec
 choices. Preserve each saved spec's rigor when planning a set unless the user changes it.
@@ -178,6 +179,15 @@ use "When you're ready, tell me `/plan the ready specs`, or name the specs you w
    for later use and their backlog status stays unchanged by planning.
 
 ### Enhanced plan rigor
+
+Plan **test-driven development (TDD)** by adding a separate TDD task immediately before
+every development task. Assign each pair to the **same developer or implementing agent**,
+including when a package contains multiple development tasks. The TDD task writes tests
+for the intended behavior and runs them to confirm the expected failure before implementation
+starts. Make the development task depend on that result; it makes the tests pass, then
+refactors while keeping them green. Keep each pair together when scheduling parallel work;
+do not delegate test creation and implementation to different agents. These are planned
+tasks for the subsequent implementation workflow, not tests to run during planning.
 
 Build **fresh-agent work-package review into the plan**, after each package's work and before
 dependent packages consume it. These are scheduled reviews of the eventual work products;
