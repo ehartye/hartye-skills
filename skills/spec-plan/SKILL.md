@@ -50,10 +50,11 @@ order them without relying on conversation memory.
    Wait for answers before drafting dependent content; when the user delegates a choice,
    record the chosen default as an assumption. Small batches make decisions easier to answer.
 3. **Ground the request in the wiki.** Find the project through its overview's `repo:` field;
-   ask for the project slug if needed. Delegate a search using wiki-master:wiki-search for
+   ask for the project slug if needed. Delegate a search using wiki-master:wiki-user in search mode for
    relevant knowledge and roadmap items. Report coverage and gaps. When coverage is light,
-   propose wiki-master:wiki-discover and wiki-master:wiki-ingest for the named gaps, using
-   existing authorization where given. Grounding keeps the spec connected to prior decisions.
+   propose wiki-master:wiki-researcher for topic discovery and ingestion of the resulting named
+   clippings for those gaps, using existing authorization where given. Grounding keeps the spec
+   connected to prior decisions.
 4. **Settle roadmap overlap with the user.** Recommend adopting a matching item, grouping
    related items with the same goal as work packages, or linking out-of-scope items as
    non-goals. Ask about unresolved conflicts. Give independent goals separate specs. Keep
@@ -82,7 +83,7 @@ order them without relying on conversation memory.
    it reads and record what it can actually show; write the criterion at that level. Where
    an artifact is new, identify its planned shape and observable result explicitly. This ties
    acceptance to evidence a later reader can obtain.
-9. **Save the specification.** Use wiki-master:wiki-author to save it at
+9. **Save the specification.** Use wiki-master:wiki-user in authoring mode to save it at
    `wiki/authored/<project>/backlog/<slug>.md`, with `kind: backlog-item` and
    `backlog-status: planned`. Write outcomes and high-level design, with acceptance expressed
    as runnable commands and expected output or repeatable observations. Give work packages
