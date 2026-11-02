@@ -34,7 +34,8 @@ Planned work-package review: <all packages | selected WP ids | not selected>
 Stage-specific choices: <accepted or declined enhancements and the user's reason, if any>
 
 Enhanced selects both enhancements. Record the actual spec-review outcome before handoff;
-the plan carries work-package reviews as future review steps.
+the plan carries a TDD task immediately before every development task, with the same developer
+owning each pair, and work-package reviews as future review steps.
 
 ## Context
 Record relevant evidence and non-obvious design context, with source links, so the planner
