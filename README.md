@@ -47,8 +47,18 @@ Wiki-backed skills target wiki-master 0.89.0 or later and its six-role catalog.
 | [q-master](skills/q-master/SKILL.md) | You are starting or joining a project, or its tools feel crowded, and want the smallest sensible set of plugins enabled. Audits what is enabled against what is installed and records the selection and rationale in a wiki note through wiki-project. |
 | [rubber-duck](skills/rubber-duck/SKILL.md) | You want a second opinion that is not just you again — stuck, pre-commitment on something hard to reverse, or asked to sanity check or red-team. Consults the other vendor's model and records it verbatim to `docs/rubber-duck/`. |
 | [ship-it](skills/ship-it/SKILL.md) | You want pending work committed, pushed, PR'd and squash-merged in one step — including when it's sitting on the default branch. |
-| [spec-plan](skills/spec-plan/SKILL.md) | You want to preload wiki-grounded specs, then plan a selected set of ready specs together. Plan mode is the normal path; explicitly authorized delegated planning can use Default/non-interactive mode with a durable complete plan and regular todos (or a saved task table/checklist). Rigor defaults to standard without a question. Use `rigor=enhanced` for fresh-agent spec review, same-developer TDD task pairs and planned fresh-agent work-package reviews, retained per spec. Combined plans sequence specs with parallel subagents within each spec and cover the project definition of done through delivery and cleanup. The skill finishes at handoff, carrying actual execution authority forward without inventing permission or requiring fresh approval just because the user is away. Where `/plan` enters Plan mode, it remains the single next action for the normal spec handoff. |
+| [spec-plan](skills/spec-plan/SKILL.md) | You want to preload wiki-grounded specs, then plan a selected set of ready specs together. Plan mode is the normal path; explicitly authorized delegated planning (added in 0.9.7) can use Default/non-interactive mode with a durable complete plan and regular todos (or a saved task table/checklist). Rigor defaults to standard without a question. Use `rigor=enhanced` for fresh-agent spec review, same-developer TDD task pairs and planned fresh-agent work-package reviews, retained per spec. Combined plans sequence specs with parallel subagents within each spec and cover the project definition of done through delivery and cleanup. The skill finishes at handoff, carrying actual execution authority forward without inventing permission or requiring fresh approval just because the user is away. Where `/plan` enters Plan mode, it remains the single next action for the normal spec handoff. |
 | [yoda](skills/yoda/SKILL.md) | Writing, editing, or reviewing a SKILL.md, or auditing a skill library — including when a skill never fires, fires but is ignored, or competes with another. |
+
+## Version notes
+
+### 0.9.7
+
+Spec-plan supports explicitly authorized delegated planning outside Plan mode, with a saved
+complete plan and regular todos or a durable task table. It retains readiness, selected
+review/TDD rigor, unresolved-decision gates and execution authorization boundaries.
+See [PR #38](https://github.com/ehartye/hartye-skills/pull/38) and the
+[validation record](docs/testing/spec-plan-delegated-results.md).
 
 ## Layout
 
