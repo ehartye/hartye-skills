@@ -65,6 +65,8 @@ on them. Resolve execution-informing decisions through the interview or a define
 Record checkable constraints, relevant commands, interfaces, project conventions and a real
 code-style example where useful. Carry forward the project's delivery procedure and the
 user's authorization boundaries so the plan can accurately describe any delivery package.
+When delegated planning is authorized, record the source and scope of that authority separately
+from execution authority, including delegated choices and any approval still required.
 
 ## Recommended tools
 List user-confirmed tools as `<name> — <reason>; used by <WP ids>`. These inform the plan's
@@ -112,6 +114,11 @@ section of the combined plan. Qualify package IDs as `<spec-slug>/WP-n`, reconci
 and shared interfaces across the set, and sequence specs in dependency-compatible selection
 order, with parallel groups inside each spec. Recheck readiness from the saved content and
 review outcome against the current repository when planning begins.
+Use Plan mode normally. With explicit user authorization for delegated planning outside it,
+follow the skill's delegated path: record actual mode, authority and assumptions, save the
+complete plan, and maintain regular todos or a durable task table/checklist as its projection.
+Preserve the same readiness, acceptance, dependencies, TDD pairs and review gates. Carry prior
+execution authority into handoff without expanding it or requiring approval just for absence.
 ```
 
 ## Spike variant
