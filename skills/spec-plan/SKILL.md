@@ -164,6 +164,9 @@ blocker to this handoff. Check Stage 2's mode prerequisite when planning actuall
    Carry each package's brief, owned files, dependencies, done-when and confirmed tools into
    its plan step. Add technical steps appropriate to the current code and the spec's scope.
    Include applicable verification and delivery requirements from the spec as future work.
+   Plan through the project's definition of done: include delivery, verification,
+   synchronization, evidence capture, and workspace cleanup as explicit tasks, so completion
+   leaves no administrative loose ends.
    Apply the Enhanced plan rigor section below to every package selected for review.
    Keep each step traceable to a requirement or package so the user can assess coverage.
 4. **Plan delegation around context and dependencies.** Default to subagents for work
