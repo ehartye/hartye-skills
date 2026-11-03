@@ -12,6 +12,10 @@ choices, not an experimentally established recipe. Section 9 preserves the earli
 recommendations as rationale; the SKILL.md defines the current procedure.
 The current workflow assumes intentional invocation and available subagents; sizing guidance
 informs the artifact's detail within that workflow.
+The authorized delegated planning path is also a workflow choice, not a measured equivalence
+to host Plan mode. It preserves the complete plan, readiness and selected rigor while using
+ordinary task tracking; explicit user authority substitutes only for the mode prerequisite,
+not for grounding, unresolved decisions, host restrictions or execution permission.
 
 An evidence synthesis addressing "how should a coding agent's spec and plan be written and executed". This page weighs and concludes; the evidence sits in the source pages it cites, and where sources disagree that is said rather than resolved. It rests on sources captured in October 2026, many of them abstract-only or vendor-authored, so read it as the best-supported practice, not a measured recipe. Related concepts: Plan Mode (Plan-then-Execute), Spec-Driven Development, Underspecification and Clarification, Context-Centric Task Decomposition, Agent-Verifiable Acceptance Criteria, Spikes and Exit Criteria.
 

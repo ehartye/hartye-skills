@@ -14,11 +14,47 @@ are available. Implementation belongs to the subsequent workflow, so finish at h
 ## Prerequisites
 
 Use wiki-master in both stages to ground the work. Create and update specs outside the host's
-plan mode so they can be saved. Plan ready specs inside the host's plan mode so planning stays
-separate from implementation. If wiki-master is unavailable or the host is in the wrong mode
-for the requested stage, stop that stage and explain what must change before resuming.
+plan mode so they can be saved. Normally plan ready specs inside the host's Plan mode.
+When that mode is unavailable or the user delegates non-interactive planning, use the
+authorized delegated path below. Otherwise, if the host is in the wrong mode for the
+requested stage, stop that stage and explain what must change before resuming. If
+wiki-master is unavailable, stop the affected stage; delegation does not replace grounding.
 Check the mode for the stage being performed, not the next stage at handoff. Finishing a
 spec in Default mode is expected; it does not block handing it off to `/plan`.
+
+### Authorized delegated planning
+
+Use this path only with explicit user authorization to plan outside Plan mode or to carry
+out delegated planning without the user present. Reuse authorization already in the
+conversation or supplied delegation; record its source and scope. Being in Default mode,
+having todo tools, a request to implement, or user silence does not by itself authorize
+this exception. Without it, report the Stage 2 mode blocker and the authorization or mode
+change needed. Normal Plan-mode planning needs no additional delegation record or ceremony.
+
+Follow the same Stage 2 procedure and selected rigor. Keep exploration read-only and write
+only planning artifacts and task tracking during this stage. Record the actual host mode,
+why this path applies, and user-delegated assumptions in the plan. Settle consequential
+scope, behavior, interface, dependency, acceptance and authorization choices through existing
+answers or explicitly delegated decision authority. If a choice remains outside that
+authority, mark the affected work blocked and ask for the decision; absence is not an answer.
+Continue independent ready work without claiming the blocked scope is ready for handoff.
+
+Save the complete plan in a durable, permitted artifact and link it at handoff. Use the
+project's plan location when defined, otherwise a named Markdown file in the task workspace.
+Project its steps into regular todos with stable task IDs, source spec/package references,
+dependencies and status. If the host has no todo support, keep an explicit task table or
+checklist with those fields in the saved plan. Keep the projection synchronized with the
+plan, including TDD pairs and review gates; todos are not a substitute for its briefs,
+acceptance criteria, constraints or decision record. Do not mark implementation or validation
+complete merely because it has been planned. If persistence is blocked, report that blocker
+and do not claim the delegated handoff is complete.
+
+Planning authorization is distinct from execution authorization. Carry actual prior execution
+authority and its limits into the handoff; do not require fresh approval solely because the
+user is away. The skill ends at handoff, after which the subsequent workflow may proceed
+within that existing authority. Planning, plan completion, delegated assumptions and silence
+never grant execution permission. Preserve host restrictions and actual permission, safety
+and review gates, including any explicit requirement for plan approval before execution.
 
 ## Rigor
 
@@ -130,7 +166,9 @@ has passed, or that the user has explicitly changed the selection. For a batch, 
 checks independently to each spec, with a fresh reviewer for each selected spec review.
 Link the saved specs and summarize each scope and whether it is ready for planning. Identify
 any draft still awaiting a decision or review separately; readiness follows from these checks,
-not a new backlog status. Close with "When you're ready, tell me `/plan the spec`." For a set,
+not a new backlog status. If planning is already requested and the delegated path is authorized,
+continue into Stage 2 for the requested ready specs. Otherwise close with
+"When you're ready, tell me `/plan the spec`." For a set,
 use "When you're ready, tell me `/plan the ready specs`, or name the specs you want planned."
 Where `/plan` enters the host's Plan mode, that command is the complete next action. Do not
 prepend a separate instruction to switch modes or describe the current Default mode as a
@@ -146,12 +184,12 @@ blocker to this handoff. Check Stage 2's mode prerequisite when planning actuall
    handoff conditions against the current repository. A saved draft or planned status alone
    establishes neither settled decisions nor a passed review. Report pending candidates and
    their reasons separately. For an explicitly requested spec with gaps or an affected review,
-   return to Stage 1 outside plan mode to settle and save it before resuming planning in plan
-   mode. For in-progress specs, establish the remaining scope from recorded results and
+   return to Stage 1 outside plan mode to settle and save it before resuming planning through
+   the applicable path. For in-progress specs, establish the remaining scope from recorded results and
    preserve ongoing work.
 2. **Reconcile the selected set.** Resolve cross-spec contradictions, dependency cycles,
    missing prerequisites and shared-interface decisions through Stage 1 outside plan mode,
-   updating affected specs and reviews before resuming planning in plan mode. A prerequisite
+   updating affected specs and reviews before resuming through the applicable planning path. A prerequisite
    may be an already verified result or another selected ready spec with a settled output
    contract. A build decision depending
    on an unresolved spike waits for its verdict. Produce one combined plan with a section per
@@ -179,9 +217,11 @@ blocker to this handoff. Check Stage 2's mode prerequisite when planning actuall
 5. **Make the plan reviewable and hand it off.** Check that the plan covers every selected
    spec's acceptance criteria, settled constraints and selected rigor. Apply the same decision and
    spike checks from Spec handoff to the resulting plan, so each package can begin with its
-   execution-informing decisions settled. Present the plan in the
-   reply using the host's plan format, or a designated plan artifact the host permits writing
-   in plan mode. End with
+   execution-informing decisions settled. In Plan mode, present the plan in the reply using
+   the host's plan format, or a designated plan artifact the host permits writing in plan mode.
+   On the delegated path, save and link the complete plan and its task projection as described
+   above. State what was planned, what was actually checked, remaining blockers and the next
+   action under the recorded execution authority. Only when the applicable checks pass, end with
    "The spec and plan are ready for handoff," or "The selected specs and combined plan are
    ready for handoff." This completes the skill's scope; the saved specs remain available
    for later use and their backlog status stays unchanged by planning.
