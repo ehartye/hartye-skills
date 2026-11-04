@@ -48,9 +48,17 @@ Wiki-backed skills target wiki-master 0.89.0 or later and its six-role catalog.
 | [rubber-duck](skills/rubber-duck/SKILL.md) | You want a second opinion that is not just you again — stuck, pre-commitment on something hard to reverse, or asked to sanity check or red-team. Consults the other vendor's model and records it verbatim to `docs/rubber-duck/`. |
 | [ship-it](skills/ship-it/SKILL.md) | You want pending work committed, pushed, PR'd and squash-merged - including explicit file scopes and linked worktrees. Preserves unrelated changes, waits for required checks, syncs the default checkout and safely resumes requested cleanup. |
 | [spec-plan](skills/spec-plan/SKILL.md) | You want to preload wiki-grounded specs, then plan a selected set of ready specs together. Plan mode is the normal path; explicitly authorized delegated planning (added in 0.9.7) can use Default/non-interactive mode with a durable complete plan and regular todos (or a saved task table/checklist). Rigor defaults to standard without a question. Use `rigor=enhanced` for fresh-agent spec review, same-developer TDD task pairs and planned fresh-agent work-package reviews, retained per spec. Combined plans sequence specs with parallel subagents within each spec and cover the project definition of done through delivery and cleanup. The skill finishes at handoff, carrying actual execution authority forward without inventing permission or requiring fresh approval just because the user is away. Where `/plan` enters Plan mode, it remains the single next action for the normal spec handoff. |
-| [yoda](skills/yoda/SKILL.md) | Writing, editing, or reviewing a SKILL.md, or auditing a skill library — including when a skill never fires, fires but is ignored, or competes with another. |
+| [yoda](skills/yoda/SKILL.md) | Writing, editing, or reviewing a SKILL.md, or auditing a skill library — including when a skill never fires, fires but is ignored, or competes with another. Includes reusable Unicode, placeholder and local-link scans. |
 
 ## Version notes
+
+### 0.10.0
+
+Yoda bundles a read-only Python scanner for suspicious Unicode, invocation placeholders and
+relative Markdown links/anchors, including untracked text files. Findings need contextual review;
+it does not certify safety or replace length/frontmatter checks.
+See the [validation record](docs/testing/yoda-scanner-results.md).
+
 
 ### 0.9.8
 
