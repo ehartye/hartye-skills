@@ -157,9 +157,10 @@ record the reviewed head SHA and ensure it matches the local and remote task bra
 Inspect `gh pr checks <n> --required`. For pending required checks, watch with
 `gh pr checks <n> --required --watch --fail-fast --interval 10`, using the host's bounded waits
 and progress updates. At the task's deadline or cancellation, stop the watcher and report pending;
-leave branches and worktrees intact. Failure/cancellation is not success. An empty required-check
-list is acceptable only if the query succeeded and the repository has no required checks;
-verify repository rules/protection when needed, and stop if permissions leave that unknown.
+leave branches and worktrees intact. Failure/cancellation is not success. Distinguish gh's
+"no checks reported" result from a transport/authentication failure: accept absent required
+checks only when read-only repository rules/protection confirms none are required. Stop if
+permissions leave that unknown; an empty rollup alone is not proof.
 After checks finish, re-read PR state, head, review decision and merge state. A changed head
 requires renewed review/checks; do not merge a different commit using stale evidence.
 

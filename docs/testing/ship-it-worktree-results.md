@@ -81,6 +81,10 @@ checks frontmatter, description length, body size, links, substitution hazards, 
 codepoints, manifest version agreement and whitespace; these do not certify behavioral safety.
 
 This release deliberately retains existing MERGED verification and separate remote deletion.
+During release verification, `gh pr checks --required` reported "no checks reported" with exit 1;
+the successful rules/protection reads confirmed no required checks. Guidance explicitly
+distinguishes that result from authentication/transport failures instead of treating exit 1 alone
+as proof of either success or a blocked release.
 It adds an exact-SHA lease for deletion, the sole exception to the prohibition on forced branch
 updates, and expected-SHA local deletion instead of unconditional `branch -D`. This protects
 concurrent new commits. Cleanup is optional, explicitly requested and contingent on ownership;
