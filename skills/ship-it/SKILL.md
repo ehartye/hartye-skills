@@ -7,12 +7,13 @@ description: Use when the user says "ship it", "ship this", "PR this up", "let's
 
 ## Overview
 
-Shorthand for the commit → branch → push → PR → merge → sync loop. Every step is a no-op when
-already satisfied, so it is safe to run at any point in the loop, including twice in a row.
+Shorthand for the branch, commit, push, PR, squash-merge and sync loop. Resume by observing
+the actual state, never by replaying mutations. Preserve other tasks' files and commits.
 
 **Core principle:** cheap and reversible steps run unattended; the two that aren't — moving the
-default branch, and merging — confirm first. Moving commits off the default branch, and `--admin`,
-confirm every time. Merging confirms every time unless the user approves it for the session.
+default branch, and merging - need authorization. Moving commits off the default branch and
+`--admin` need explicit authorization for that action; do not infer it from merge approval.
+Merging confirms every time unless the user approves it for the session.
 
 ## The Pipeline
 
@@ -22,8 +23,9 @@ Run in order. Any step that reports **stop** ends the run: state where it got to
 packaging or tagging step — is coming, ask one question with the structured-question tool and two
 answers: treat those steps as approved for the rest of the session, or re-ask each time. Skip it if
 the user has already stated the answer in this session. The answer lives in the conversation only;
-nothing is written to disk. It never covers moving commits off the default branch or `--admin`, and
-`BLOCKED` and `DIRTY` still stop.
+nothing is written to disk. It never implicitly covers moving commits off the default branch or
+`--admin`; honor explicit authorization for those actions. Conflicts and unmet protection stop;
+pending required checks are a wait, not an instruction to bypass protection.
 
 ### 1. Orient
 
@@ -32,9 +34,17 @@ git rev-parse --abbrev-ref HEAD                                  # detached? -> 
 git symbolic-ref --quiet --short refs/remotes/origin/HEAD        # -> origin/main | origin/master
 ```
 
-Never hardcode `main`. Fall back to `gh repo view --json defaultBranchRef -q .defaultBranchRef.name`,
-then to `main`. If `.git/rebase-merge`, `.git/rebase-apply`, or `MERGE_HEAD` exists, **stop** — an
-operation is already in flight.
+Never hardcode `main`. Fall back to `gh repo view --json defaultBranchRef -q .defaultBranchRef.name`;
+if unresolved, stop. Inspect `git worktree list --porcelain` and record the absolute task path,
+branch, HEAD and existing default checkout. Use Git's paths: `git rev-parse --git-path rebase-merge`,
+`rebase-apply`, `MERGE_HEAD`, `CHERRY_PICK_HEAD` and `REVERT_HEAD`. If any exists, **stop**.
+In a linked worktree `.git` is a file, not the operation directory.
+
+Read staged, unstaged and untracked changes before touching the index. Record the caller's
+explicit paths and which worktree belongs to this task; do not infer ownership from its name.
+Find the PR for this repository, base and head branch, including closed PRs when resuming.
+If already MERGED, skip commits/push/merge and go to verification and sync. If CLOSED but
+unmerged, stop; do not silently open a replacement. A failed query is unknown, not absence.
 
 Nothing to ship — clean tree, nothing unpushed, no open PR — is a valid outcome. Say so and stop.
 Never manufacture a commit so the run has something to do.
@@ -63,7 +73,25 @@ trusting.
 
 ### 3. Commit
 
-Stage everything, then **match the repo's existing message style** — read it, don't impose one:
+**Explicit paths take precedence.** Treat them as literal repository-relative whole-file paths,
+not globs; include both sides of a rename. Show the selected working-tree diff first. For
+partial-hunk intent, stop to settle the selection instead of committing the entire file.
+Run from the repository root, quote each path using the host shell, then:
+
+```bash
+git --literal-pathspecs add -- <selected-paths>
+git --literal-pathspecs commit --only -m "<message>" -- <selected-paths>
+```
+
+`--only` commits these files' working-tree contents and leaves unrelated staged changes staged.
+Plain `git commit` would include those other changes. Include selected new files with `add`
+first; selected deletions are valid. Never reset, stash, clean or unstage somebody else's work.
+Check the resulting commit's paths and the remaining index/tree against the initial inventory.
+If add, a hook or commit fails, inspect the state and report it; do not retry with broader staging
+or discard changes. Without explicit paths, stage all only when all changes belong to the task;
+otherwise establish the task's scope first.
+
+**Match the repo's existing message style** - read it, don't impose one:
 
 ```bash
 git log --format=%s -20
@@ -80,7 +108,8 @@ No remote configured → **stop**, work is committed locally.
 git push -u origin <branch>
 ```
 
-**Never `--force`, `--force-with-lease`, or any history rewrite.** Not as a fallback, not on a
+**Never force a branch update or rewrite history.** No `--force` or `--force-with-lease` on this
+push, not as a fallback, not on a
 rejected push. A rejected push means someone else's work is at risk — stop and report.
 
 ### 5. Pull request
@@ -113,22 +142,39 @@ blocked", and sails straight past the case this check exists to catch:
 
 ```bash
 for i in $(seq 10); do
-  STATUS=$(gh pr view <n> --json mergeStateStatus -q .mergeStateStatus)
+  STATUS=$(gh pr view <n> --json mergeStateStatus -q .mergeStateStatus) || exit 1
+  [ -n "$STATUS" ] || exit 1
   [ "$STATUS" != UNKNOWN ] && break
   sleep 2
 done
 ```
 
-`BLOCKED` means branch protection is refusing — usually a required approving review, which you
-cannot satisfy by approving your own PR. `DIRTY` means conflicts. **Stop and report either.**
-`gh pr merge --admin` bypasses protection where `enforce_admins` is off, but that is the user's call
-to make, not a fallback to reach for.
+Read `state,baseRefName,headRefName,headRefOid,mergeStateStatus,reviewDecision,statusCheckRollup`.
+A connector's `mergeable` boolean is insufficient: use this read-only `gh pr view --json ...`
+fallback when it omits those fields. Review the full PR diff, not only this run's selected files;
+record the reviewed head SHA and ensure it matches the local and remote task branch.
 
-If the status is still `UNKNOWN` after polling, say so rather than assuming it is fine — the merge
-below may still fail, and step 7b is what catches that.
+Inspect `gh pr checks <n> --required`. For pending required checks, watch with
+`gh pr checks <n> --required --watch --fail-fast --interval 10`, using the host's bounded waits
+and progress updates. At the task's deadline or cancellation, stop the watcher and report pending;
+leave branches and worktrees intact. Failure/cancellation is not success. Distinguish gh's
+"no checks reported" result from a transport/authentication failure: accept absent required
+checks only when read-only repository rules/protection confirms none are required. Stop if
+permissions leave that unknown; an empty rollup alone is not proof.
+After checks finish, re-read PR state, head, review decision and merge state. A changed head
+requires renewed review/checks; do not merge a different commit using stale evidence.
+
+`BLOCKED` after checks pass means an unmet protection (for example review or merge queue);
+report the specific blocker and stop. `DIRTY` means conflicts: stop. If `UNSTABLE`, inspect
+non-required checks and use an explicit repository/user policy; absent one, stop and report.
+`gh pr merge --admin` bypasses protection where `enforce_admins` is off, but that is the user's call
+to make, not a fallback to reach for. Report exactly which protection any authorized override bypasses.
+
+If the status is still `UNKNOWN` after polling, stop rather than assuming it is fine. For CLEAN
+(or an explicitly permitted, understood non-required-check state), merge the reviewed commit:
 
 ```bash
-gh pr merge <n> --squash
+gh pr merge <n> --squash --match-head-commit <reviewed-head-sha>
 ```
 
 **Verify the merge landed before touching any branch.** `gh pr merge` can fail — protection, a
@@ -137,24 +183,57 @@ Deleting the branch of an unmerged PR *closes that PR* and removes the remote co
 
 ```bash
 test "$(gh pr view <n> --json state -q .state)" = MERGED || exit 1
-git push origin --delete <branch>       # remote only, and only once MERGED is confirmed
 ```
 
-Squash keeps the default branch linear, one commit per PR. Delete the remote branch so
-`git branch -r` stops reporting squash-merged work as unmerged; keep the local one, which is where
-the granular commits remain reachable. Merge conflict → **stop**, hand back.
+Read back the PR identity, merged head and merge commit with
+`gh pr view <n> --json state,baseRefName,headRefName,headRefOid,headRepository,headRepositoryOwner,mergeCommit`.
+Verify the expected repository and branch identities; `headRefOid` is the PR head, not a fresh
+branch lookup. Missing evidence stops cleanup. A nonzero merge command may
+still have merged: query before retrying. If unavailable, report an uncertain outcome and stop
+all cleanup. On resume, use the confirmed merged PR head as the expected task head; never push
+new local commits into that closed task. Squash ancestry (`git branch --merged`) is not the test.
+
+Delete the remote branch separately, only after MERGED is confirmed and a fresh remote lookup
+matches that merged head. If absent, this step is done. If advanced or the lookup fails, preserve
+it and report. Use an exact-SHA lease for the deletion so a concurrent push cannot be erased:
+
+```bash
+git push --force-with-lease=refs/heads/<branch>:<merged-head-sha> origin :refs/heads/<branch>
+```
+
+This conditional deletion is the sole lease exception to step 4; it never rewrites history.
+Keep the local branch unless task-worktree cleanup was requested (step 8). A failed remote
+deletion is a cleanup failure, not a failed merge; report it and retain the local recovery copy.
 
 If a branch was deleted in error, the work is recoverable: the local branch still holds the commits,
 so `git push -u origin <branch>` followed by `gh pr reopen <n>` restores both.
 
 ### 8. Sync
 
-```bash
-git switch <default> && git pull --ff-only
-```
+Locate the default checkout with `git worktree list --porcelain`. Never switch a linked task
+worktree to a branch checked out elsewhere. In the default checkout, verify its branch, clean
+index/tree (including untracked files) and absence of in-flight Git operations before
+`git -C "<default-checkout>" pull --ff-only`. If dirty, missing, detached or divergent, preserve
+it and report sync deferred. If there is no separate default checkout and this is an ordinary
+checkout, switch to the resolved default only when clean, then pull `--ff-only`.
+Verify the reported merge commit is reachable from the updated default HEAD.
 
-`--ff-only` because after a squash-merge a non-fast-forward pull means something unexpected
-happened; surface it rather than silently creating a merge commit.
+For requested task-worktree cleanup, first verify successful sync and remote deletion, then
+recheck that the task branch and worktree HEAD equal the merged PR head, the task worktree is
+owned by this task, and no other worktree uses that branch. Check for in-flight operations and
+all staged, unstaged, untracked **and ignored** files (`git status --porcelain --untracked-files=all`
+and `git ls-files --others --ignored --exclude-standard`). If any remain or HEAD advanced,
+preserve the worktree/branch and report deferred cleanup. Do not use force to remove a worktree.
+
+From outside that worktree, remove only its recorded absolute path with `git worktree remove`,
+verify success and rediscover branch/worktree state, then delete only that verified local task
+ref with `git update-ref -d refs/heads/<branch> <merged-head-sha>`. This expected-SHA deletion
+rejects concurrent new commits, unlike unconditional `git branch -D`. Squash ancestry is not
+required; the confirmed PR and exact head supply the evidence. Retain
+the branch if the user asked to keep it. Never remove the primary/default checkout. On an
+interrupted cleanup, rediscover worktrees and refs; already-absent objects are done, unknown
+ownership or changed heads stop deletion. Do not call a partial release fully shipped: report
+merge, sync, remote deletion and local cleanup separately.
 
 ## Signals to Watch For
 
@@ -169,7 +248,10 @@ Noticing any of these means the pipeline has drifted into doing harm. Stop and r
 | Amending or rebasing pushed commits | Push a new commit; pushed history is shared |
 | `gh pr merge -d` to clear the remote | It deletes the local branch too — push a delete instead |
 | Deleting the branch without checking the PR merged | A failed merge plus a branch delete *closes* the PR — assert `state == MERGED` first |
-| Treating `BLOCKED` as something to work around | Protection is a decision someone made; report it and let the user choose `--admin` |
+| Treating pending CI as a permanent block or bypassing it | Watch required checks, then re-read protection and head |
+| Broad staging with explicit paths or foreign staged files | Literal selected paths and `commit --only`; preserve the other index entries |
+| Switching to a default branch checked out elsewhere | Sync its clean checkout with `git -C` |
+| Removing a dirty worktree or a branch that advanced after merge | Preserve it and report deferred cleanup |
 | Reading `mergeStateStatus` once, right after creating the PR | It is `UNKNOWN` for the first few seconds — poll, or the check silently passes everything |
 | Merging, packaging or tagging without asking, on an approval nobody gave | Ask the session question first; no answer means re-ask each time |
 | Reporting "shipped" after a stop | Name the step reached and what is left |
