@@ -258,7 +258,33 @@ well-formed. You have not established that it is safe, and saying otherwise is t
 step exists to prevent. Safety needs tooling that scans for invisible codepoints, and provenance
 — who wrote it, from where.
 
-Flag it explicitly when auditing a skill you did not write.
+Run the bundled read-only scanner with Python 3.10 or later. Resolve the script from this
+installed skill's directory; pass the library root, not just tracked or changed files:
+
+```bash
+python <yoda-skill-dir>/scripts/audit_scan.py <library-root>
+```
+
+Use `--check unicode`, `--check placeholders` or `--check links` for one check. Directory scans
+include untracked common text files, excluding `.git`, `node_modules`, `.venv` and `__pycache__`;
+pass an explicit file for another extension. Output is ASCII-safe JSON lines with path and line.
+Exit 0 means no warnings (declared argument candidates may still print info), 1 means review
+findings, and 2 means an invocation or traversal failure prevented scanning. Nothing is written or fetched.
+
+Unicode findings include format/control characters, nonordinary spaces, tags and variation
+selectors. Emoji variation selectors and legitimate nonbreaking spaces still need context;
+a finding is not proof of malicious content. Placeholder checks cover all of each `SKILL.md`,
+including fences. A nonempty single-line `argument-hint` marks full-argument placeholders as
+intended candidates, never proves intent; numeric placeholders remain warnings.
+
+Links cover inline destinations (including multiline labels), reference definitions, ATX heading
+anchors and explicit HTML IDs, confined to the scan root. Code examples and remote URLs are not
+checked. This is not a full Markdown renderer: reference uses without definitions, setext headings,
+complex nested syntax and renderer-specific slugs need manual review. Symlinks are skipped with a
+warning; escaped targets are refused. Use the common containing directory for sibling references.
+
+Keep the existing length/frontmatter checks and manual trigger-overlap review. These scanners do
+not validate YAML or certify safety. Flag those limits explicitly when auditing an unfamiliar skill.
 
 ## Reporting an audit
 
