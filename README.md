@@ -46,11 +46,19 @@ Wiki-backed skills target wiki-master 0.89.0 or later and its six-role catalog.
 | [beautiful](skills/beautiful/SKILL.md) | Building or reshaping any user-facing interface, or a design reads as templated and AI-generated. Covers aesthetic direction, typography, palette, layout, motion, and interface copy. |
 | [q-master](skills/q-master/SKILL.md) | You are starting or joining a project, or its tools feel crowded, and want the smallest sensible set of plugins enabled. Audits what is enabled against what is installed and records the selection and rationale in a wiki note through wiki-project. |
 | [rubber-duck](skills/rubber-duck/SKILL.md) | You want a second opinion that is not just you again — stuck, pre-commitment on something hard to reverse, or asked to sanity check or red-team. Consults the other vendor's model and records it verbatim to `docs/rubber-duck/`. |
-| [ship-it](skills/ship-it/SKILL.md) | You want pending work committed, pushed, PR'd and squash-merged in one step — including when it's sitting on the default branch. |
+| [ship-it](skills/ship-it/SKILL.md) | You want pending work committed, pushed, PR'd and squash-merged - including explicit file scopes and linked worktrees. Preserves unrelated changes, waits for required checks, syncs the default checkout and safely resumes requested cleanup. |
 | [spec-plan](skills/spec-plan/SKILL.md) | You want to preload wiki-grounded specs, then plan a selected set of ready specs together. Plan mode is the normal path; explicitly authorized delegated planning (added in 0.9.7) can use Default/non-interactive mode with a durable complete plan and regular todos (or a saved task table/checklist). Rigor defaults to standard without a question. Use `rigor=enhanced` for fresh-agent spec review, same-developer TDD task pairs and planned fresh-agent work-package reviews, retained per spec. Combined plans sequence specs with parallel subagents within each spec and cover the project definition of done through delivery and cleanup. The skill finishes at handoff, carrying actual execution authority forward without inventing permission or requiring fresh approval just because the user is away. Where `/plan` enters Plan mode, it remains the single next action for the normal spec handoff. |
 | [yoda](skills/yoda/SKILL.md) | Writing, editing, or reviewing a SKILL.md, or auditing a skill library — including when a skill never fires, fires but is ignored, or competes with another. |
 
 ## Version notes
+
+### 0.9.8
+
+Ship-it supports literal explicit paths without including other staged work, waits for required
+checks, verifies the reviewed head at merge, and synchronizes a separate default checkout.
+Requested worktree cleanup preserves dirty, ignored or newly committed work; conditional ref
+deletion rejects concurrent advances. Interrupted releases resume from verified state.
+See the [validation record](docs/testing/ship-it-worktree-results.md).
 
 ### 0.9.7
 
