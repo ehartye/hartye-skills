@@ -97,7 +97,7 @@ order them without relying on conversation memory.
 4. **Settle roadmap overlap with the user.** Recommend adopting a matching item, grouping
    related items with the same goal as work packages, or linking out-of-scope items as
    non-goals. Ask about unresolved conflicts. Give independent goals separate specs. Keep
-   absorbed items discoverable with `Specced in [[<spec>]] (WP-n)` on their roadmap entries.
+   absorbed items discoverable with `specced-in: ["[[<spec>|WPn]]"]` in their frontmatter.
 5. **Explore the code read-only through subagents.** Establish real files, interfaces,
    commands and current behavior. Keep the findings that affect design or acceptance.
    Have exploration identify the available project skills and plugins that fit the work;

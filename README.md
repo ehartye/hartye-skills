@@ -52,6 +52,13 @@ Wiki-backed skills target wiki-master 0.89.0 or later and its six-role catalog.
 
 ## Version notes
 
+### 0.10.1
+
+Spec-plan marks each absorbed backlog item with a `specced-in: ["[[<spec>|WPn]]"]` frontmatter
+key instead of a `Specced in [[<spec>]] (WP-n)` prose line. wiki-master 0.95.0 or later validates
+the key and lists the spec's items on the roadmap; an older wiki-master ignores it.
+See the [validation record](docs/testing/spec-plan-specced-in-results.md).
+
 ### 0.10.0
 
 Yoda bundles a read-only Python scanner for suspicious Unicode, invocation placeholders and

@@ -47,7 +47,8 @@ roadmap items that remain separate.
 
 ## Absorbed and related items
 Link absorbed items to their work packages. Each absorbed roadmap entry points here with
-`Specced in [[<this spec>]] (WP-n)` so it remains discoverable.
+`specced-in: ["[[<this spec>|WPn]]"]` in its frontmatter, not a prose line, so it remains
+discoverable. wiki-master 0.95.0 or later validates the key; an older wiki-master ignores it.
 
 ## Decisions
 List each settled choice with its reason. These decisions let planning focus on concrete steps.
