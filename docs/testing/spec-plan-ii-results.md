@@ -482,6 +482,78 @@ fixture copy with the Expectations section removed. No behavior regressed.
 
   > - **Handoff, Hardening:** "csv-export: N = 0. No independent review of the self-certified work will happen. xlsx-export: none, because it is a spike."
 
-S1b and S3 were not re-run. Their expectations rest on Stage 2 step 3 (formerly step 2) and the
-hardening contract. The contract is unchanged. Step 3's change widens when it fires, from both
-records missing to either missing, which S1b's both-missing case still meets.
+S1b and S3 to S3d were re-run against this same text; see "Shipping-text re-runs" below.
+
+## Shipping-text re-runs, 2026-11-08
+
+The pre-PR review found that S1b (E6) and S3 to S3d (E13 to E19) had been recorded only against
+the first `SKILL.md` blob (`65dc564…`), not the restructured text that ships. Failing check before
+these runs: no `**S1b` or `**S3` result line appears in the Remediation section (grep exit 1).
+
+Tested text: `SKILL.md` git blob `d6012ad20684b31b70558658aa2b73223719075a`, template git blob
+`623d23115078461fbf03acf4220ff05c63908f4c`, fixture git blob
+`1aa7ec25ba7f6853578bf682fd2d1eef10794b2f`. Each run used a fresh agent given only those two skill
+files and a fixture copy with the Expectations section removed, told to read nothing else.
+
+**S1b:** E6 PASS.
+
+> **6. Spot the missing reviews (me).** There is no record of a self-review and no record of a sanity check. Stage 2 step 3 says to run whichever is missing before planning, without asking, so I run both.
+
+> I hold the self-review record outside the spec until the sanity check returns, so the checker can't read it.
+
+> It gets nothing else: no self-review notes and none of my conclusions. Fixture result: "No concerns."
+
+> Planning starts here, after action 11.
+
+**S3:** E13, E14, E15 and E16 PASS.
+
+- **E13 PASS.**
+
+  > - **Why this class:** The reviewer gave it two classes (COMPLIANCE and IMMINENT). The contract says a finding with two labels takes the higher one.
+
+  > - **Why this class:** The reviewer put it on the line between two classes, and a borderline finding takes the higher one.
+
+  The first is F1 (IMMINENT), the second F3 (BEST-PRACTICE).
+- **E14 PASS.**
+
+  > - **Disposition: waiting for the user.** I am presenting it to the user with the evidence and recommending we refute it. Nothing is changed until the user decides.
+
+  > - **Disposition: log it.** I write a backlog item myself through wiki-master:wiki-project, at `wiki/authored/ledger/backlog/csv-export-progress-indicator.md` with `kind: backlog-item`. The reason: no real ledger reaches the threshold today.
+
+  > | 2 | F3 | BEST-PRACTICE | Confirmed | Fix (dev-wp1, triple) | Low risk, fits the objective |
+  > | 2 | F4 | EDGE | Not reachable at today's ledger sizes | Logged | `[[csv-export-progress-indicator]]` |
+
+- **E15 PASS.**
+
+  > `dev-wp1` fixes F1 and F3. It is still available, so I continue it in place with its context intact, through SendMessage.
+
+  > 1. **TDD (write the failing test first):**
+
+  > 3. **Certification:** run `npm test`, `npm run lint` and `npm run build`. Return:
+  >    - the raw test-runner output;
+  >    - a diff of the test files since the red step;
+
+- **E16 PASS.**
+
+  > So I pause before delivery. The F1 and F3 fixes go ahead while I wait, because they need no decision from the user. WP3 waits for both answers below.
+
+  > Should I run it, or do you give permission to deliver without it?
+
+**S3b:** E17 PASS.
+
+> - I go straight to WP3 (the draft PR), within the execution authority recorded in the plan. No question to the user is needed.
+
+**S3c:** E18 PASS.
+
+> - Round 1 had no IMMINENT or COMPLIANCE findings. So once both are dispositioned and the F3 fix is certified, early stop applies: hardening stops and I go to WP3, even though rounds 2 and 3 remain.
+
+**S3d:** E19 PASS.
+
+> - **Who fixes F1:** a fresh developer agent. It is not `dev-wp2`, not me, and not a reviewer.
+> - **What it is given:**
+>   - WP1's original package brief, with owned files, dependencies, done-when and tools;
+>   - WP1's certification evidence, both the original and the round-1 re-certification;
+>   - the findings to fix: F1, and F3, which goes to the same agent because it is in the same file.
+
+With these runs and the S1 and S2 re-runs above, every expectation, E1 to E19 plus E4b, is
+recorded as passing against `SKILL.md` blob `d6012ad`.
