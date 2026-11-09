@@ -15,7 +15,8 @@ that the executor follows.
 
 ## Arguments
 
-- `hardening=N` may appear anywhere in the arguments; the rest is the request.
+- `hardening=N` may appear anywhere in the arguments or in the planning request (for example
+  `/plan the spec hardening=3`); the rest is the request.
 - N is a non-negative integer: the most hardening rounds the plan allows for each build spec.
 - When it is omitted, N is **2**. The value comes only from the argument or this default; a spec
   never carries a round count. Record N in the plan.
@@ -119,8 +120,7 @@ Record dependencies between specs as links with the required outcome or interfac
   disputed, and the user's decisions. A spec still waiting on one of these is not ready.
 - **Close.** Link the saved specs and say which are ready. If planning was requested and the
   delegated path below is authorized, continue into Stage 2. Otherwise end with "When you're
-  ready, run `/spec-plan-ii plan the spec` in Plan mode (add `hardening=N` to change the default
-  of 2)."
+  ready, tell me `/plan the spec`."
 
 ## Stage 2: Plan
 
