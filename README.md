@@ -53,6 +53,12 @@ Wiki-backed skills target wiki-master 0.89.0 or later and its six-role catalog.
 
 ## Version notes
 
+### 0.11.1
+
+spec-plan-ii now closes a finished spec with "When you're ready, tell me `/plan the spec`." in place
+of a skill-specific command. `hardening=N` can go in the planning request, for example
+`/plan the spec hardening=3`. See the [validation record](docs/testing/spec-plan-ii-results.md).
+
 ### 0.11.0
 
 Adds spec-plan-ii, a spec-and-plan skill with self-review, blind sanity checks, test-first
