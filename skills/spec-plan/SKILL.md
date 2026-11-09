@@ -3,6 +3,7 @@ name: spec-plan
 description: Produces wiki-grounded specifications and reviewable plans for one or more changes, with standard or enhanced rigor.
 when_to_use: Use when asked to spec, scope or write up features, changes or spikes before building them; to preload specs on the roadmap; or to plan one or more ready specs, including "/plan the spec" and "/plan the ready specs".
 argument-hint: "[rigor=standard|enhanced] [request]"
+disable-model-invocation: true
 ---
 
 # Spec and Plan
