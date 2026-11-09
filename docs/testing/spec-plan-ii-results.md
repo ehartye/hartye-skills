@@ -557,3 +557,25 @@ files and a fixture copy with the Expectations section removed, told to read not
 
 With these runs and the S1 and S2 re-runs above, every expectation, E1 to E19 plus E4b, is
 recorded as passing against `SKILL.md` blob `d6012ad`.
+
+## Handoff line (2026-11-09)
+
+**Change:** the Stage 1 close now points the user at `/plan the spec`, not at a skill-specific command
+plus a Plan-mode instruction. The Arguments section also notes that `hardening=N` may appear in the
+planning request.
+
+**Method:** one fresh agent per condition. Each agent was given only the skill's `SKILL.md`, its
+spec template, and a one-paragraph situation: Stage 1 complete for one ready build spec, planning
+not requested, no delegated authorization. Each was asked for its verbatim closing message.
+
+**Before (fails):**
+
+> When you're ready, run `/spec-plan-ii plan the spec` in Plan mode (add `hardening=N` to change the default of 2).
+
+**After (passes):**
+
+> When you're ready, tell me `/plan the spec`.
+
+The same agent was asked what limit it records for `/plan the spec hardening=3` in Plan mode:
+
+> I record a hardening limit of 3 rounds for `csv-export`, because the `hardening=3` argument replaces the default of 2.
