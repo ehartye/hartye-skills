@@ -115,5 +115,5 @@ red commit in 2 of 3 original remediations (trials 1 and 3) and in 1 of 3 fresh 
 - **Shared dispositions.** The orchestrator dispositioned the findings itself, using one set of
   rules across trials.
 - **Brief encoding.** The copy of the brief the trial agents received held a literal U+FEFF
-  character where the brief means the `﻿` escape. Every agent read it correctly. The copies
+  character where the brief means the `\ufeff` escape. Every agent read it correctly. The copies
   stored here use the visible escape.
