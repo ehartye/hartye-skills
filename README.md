@@ -44,13 +44,25 @@ Wiki-backed skills target wiki-master 0.89.0 or later and its six-role catalog.
 | ----- | -------- |
 | [ask-me](skills/ask-me/SKILL.md) | You are offering a free moment, or want the agent to ask you what it is waiting on. Groups pending decisions with context and recommendations, waits for each submitted answer, and supports multiple selections through native controls or text. |
 | [beautiful](skills/beautiful/SKILL.md) | Building or reshaping any user-facing interface, or a design reads as templated and AI-generated. Covers aesthetic direction, typography, palette, layout, motion, and interface copy. |
+| [brief-me](skills/brief-me/SKILL.md) | You want a brief on a request before anything happens. Reports only what is already in context, keeping facts, inferences, general background and unknowns apart, then offers a follow-up research request. |
+| [challenge](skills/challenge/SKILL.md) | You want an idea, concept or course of action sanity checked: are we thinking about this right, and what are we missing? Gives a verdict, where "it holds up" is a complete answer, and offers a blind evaluation from a fresh subagent. |
+| [green-field](skills/green-field/SKILL.md) | You want a reframing thought exercise: how would we do it if none of the current solution, approach or constraints existed today? Sketches widely, with no feasibility check, ranking or plan. |
+| [other-guy](skills/other-guy/SKILL.md) | You want a second opinion that is not just you again. Invoke-only, typed as `/other-guy`. Consults the other vendor's model and records it verbatim to `docs/other-guy/`. Formerly rubber-duck. |
 | [q-master](skills/q-master/SKILL.md) | You are starting or joining a project, or its tools feel crowded, and want the smallest sensible set of plugins enabled. Audits what is enabled against what is installed and records the selection and rationale in a wiki note through wiki-project. |
-| [rubber-duck](skills/rubber-duck/SKILL.md) | You want a second opinion that is not just you again — stuck, pre-commitment on something hard to reverse, or asked to sanity check or red-team. Consults the other vendor's model and records it verbatim to `docs/rubber-duck/`. |
 | [ship-it](skills/ship-it/SKILL.md) | You want pending work committed, pushed, PR'd and squash-merged - including explicit file scopes and linked worktrees. Preserves unrelated changes, waits for required checks, syncs the default checkout and safely resumes requested cleanup. |
 | [spec-plan](skills/spec-plan/SKILL.md) | You want specs written and planned with built-in hardening; invoke-only, typed as `/spec-plan`. The orchestrator writes every spec, gives each a self-review and then a blind sanity check (false premise, over-engineering/YAGNI, blind spots), and treats the check as advice, taking disagreements to the user. There are no rigor levels: every dev task is TDD → dev → self-certification with raw evidence. Before delivery, `hardening=N` (default 2) sets the maximum number of independent hardening rounds, whose findings are classed IMMINENT, COMPLIANCE, BEST-PRACTICE or EDGE; rounds stop early after one with no IMMINENT or COMPLIANCE findings. Explicitly authorized delegated planning can run outside Plan mode with a durable saved plan. |
 | [yoda](skills/yoda/SKILL.md) | Writing, editing, or reviewing a SKILL.md, or auditing a skill library — including when a skill never fires, fires but is ignored, or competes with another. Includes reusable Unicode, placeholder and local-link scans. |
 
 ## Version notes
+
+### 0.13.0
+
+Adds three thinking skills: brief-me (a context-only report, then a research offer), challenge (a
+fresh-perspective sanity check, then a blind evaluation offer) and green-field (a reframing thought
+exercise). rubber-duck is renamed other-guy and is now invoke-only, typed as `/other-guy`. It records
+to `docs/other-guy/`; existing `docs/rubber-duck/` records stay where they are. Phrases such as
+"challenge", "sanity check" and "red-team" now load challenge.
+See the [validation record](docs/testing/thinking-skills-results.md).
 
 ### 0.12.0
 

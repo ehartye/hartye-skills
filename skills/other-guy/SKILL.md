@@ -1,10 +1,10 @@
 ---
-name: rubber-duck
-description: Gets a second opinion from a different vendor's model and records it verbatim to docs/rubber-duck — Codex (GPT-6 Astra, high reasoning) when running in Claude Code, Claude (Fable 5.1) when running in Codex.
-when_to_use: Use when stuck, before committing to an approach that is hard to reverse, or when asked to rubber duck, sanity check, red-team, challenge, or get a second opinion on something. Also when you notice you may be agreeing with yourself, or when a plan has felt right for a suspiciously long time.
+name: other-guy
+description: Gets a second opinion from a different vendor's model and records it verbatim to docs/other-guy — Codex (GPT-6 Astra, high reasoning) when running in Claude Code, Claude (Fable 5.1) when running in Codex.
+disable-model-invocation: true
 ---
 
-# Rubber Duck
+# Other Guy
 
 ## Overview
 
@@ -20,7 +20,7 @@ This skill asks the other vendor's frontier model, and records what it said with
 question spawned six same-model perspective subagents and never once considered another vendor's
 model. That is the default this skill exists to override.
 
-## 1. Pick the duck — it is always the other vendor
+## 1. Pick the other guy — it is always the other vendor
 
 | You are running in | Ask | Model |
 | ------------------ | --- | ----- |
@@ -29,7 +29,7 @@ model. That is the default this skill exists to override.
 
 You know which one you are. Route on that, and **never** substitute a same-vendor subagent
 because the other CLI is missing or slow — that silently returns you to the failure above.
-If the CLI is unavailable, **stop and say so**; a missing duck is a reportable outcome, not
+If the CLI is unavailable, **stop and say so**; a missing other guy is a reportable outcome, not
 something to paper over.
 
 Verify first:
@@ -39,11 +39,11 @@ command -v codex    # from Claude Code
 command -v claude   # from Codex
 ```
 
-## 2. Brief the duck — it has none of your context
+## 2. Brief the other guy — it has none of your context
 
-This is where the consult actually succeeds or fails. The duck has no conversation history, no
+This is where the consult actually succeeds or fails. The other guy has no conversation history, no
 memory of what you tried, and no idea what constraints are real. An underspecified prompt returns
-generic advice you will correctly ignore, which then reads as "the duck was useless" when the
+generic advice you will correctly ignore, which then reads as "the other guy was useless" when the
 brief was the problem.
 
 Write a self-contained brief containing all five:
@@ -62,7 +62,7 @@ Write a self-contained brief containing all five:
 **Never ask a leading question.** "Don't you think X is right?" gets you X back and teaches you
 nothing. If you would be annoyed by the answer "yes," the question is leading.
 
-The duck can read the repo — it runs in the working directory with read access — so point it at
+The other guy can read the repo — it runs in the working directory with read access — so point it at
 real files rather than pasting long excerpts.
 
 ## 3. Run the consult
@@ -87,18 +87,18 @@ weigh it as though it were complete.
 
 ## 4. Record it verbatim
 
-Write the duck's answer to `docs/rubber-duck/` **in the repo you are working in**, byte for byte:
+Write the other guy's answer to `docs/other-guy/` **in the repo you are working in**, byte for byte:
 
 ```
-docs/rubber-duck/YYYY-MM-DD-<short-slug>.md
+docs/other-guy/YYYY-MM-DD-<short-slug>.md
 ```
 
 Capture stdout directly rather than retyping or summarizing. Add a short header of your own —
-date, model consulted, the question asked — then the duck's response **unedited beneath it**.
+date, model consulted, the question asked — then the other guy's response **unedited beneath it**.
 
 **Summarizing here is the failure mode.** You have just paid for an opinion specifically because
 it is not yours; compressing it through your own judgement is how the disagreement quietly
-disappears. If the duck said something you think is wrong, record it and then say you think it is
+disappears. If the other guy said something you think is wrong, record it and then say you think it is
 wrong. Both parts.
 
 Do not edit the report later to match what you ended up doing. It is a record of what was said at
@@ -106,12 +106,12 @@ the time, and its value is that it can contradict you.
 
 ## 5. Report what came back, especially if it stings
 
-Lead with **where the duck disagreed** — that is the entire return on the consult. Agreement is
+Lead with **where the other guy disagreed** — that is the entire return on the consult. Agreement is
 worth one line; disagreement is worth the detail.
 
-For each substantive point: what the duck said, whether you think it is right, and what you are
-changing. "The duck raised X, and I still disagree because Y" is a fine outcome and an honest
-one. "The duck agreed with me" as a whole summary usually means the brief was leading — check
+For each substantive point: what the other guy said, whether you think it is right, and what you are
+changing. "The other guy raised X, and I still disagree because Y" is a fine outcome and an honest
+one. "The other guy agreed with me" as a whole summary usually means the brief was leading — check
 step 2 before believing it.
 
 Link the report path so the raw answer is one click away.
@@ -122,16 +122,16 @@ Link the report path so the raw answer is one click away.
 | ------ | ------- |
 | Reaching for a subagent, perspective pass, or "let me think about this differently" | Those are all you. Route to the other vendor. |
 | "The other CLI isn't set up, I'll approximate it" | You cannot approximate a different model. Stop and report. |
-| Writing a brief that assumes context the duck cannot have | It has none. All five parts, self-contained. |
+| Writing a brief that assumes context the other guy cannot have | It has none. All five parts, self-contained. |
 | Phrasing the question so agreement is the natural answer | If "yes" would annoy you, the question is leading |
 | Summarizing the response into your own words | Verbatim. The point is that it is not your words. |
 | Reporting only the parts that matched your view | Lead with the disagreement — it is what you paid for |
 | Editing an old report to match what you shipped | It is a record, not a justification |
-| Treating the duck as an authority | It is one more opinion, from a model with different blind spots — not fewer |
+| Treating the other guy as an authority | It is one more opinion, from a model with different blind spots — not fewer |
 
 ## What this is not
 
-The duck is not a reviewer, an approver, or a tiebreaker. It has less context than you and no
+The other guy is not a reviewer, an approver, or a tiebreaker. It has less context than you and no
 stake in the outcome. A disagreement is a prompt to think again, not a verdict — and if you
 consult it on something you have already decided, you will find a way to read the answer as
 agreement.
