@@ -134,7 +134,7 @@ def scan(root, checks):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Read-only UTF-8 audit, including untracked files. Python 3.10+. '
+    parser = argparse.ArgumentParser(description='Read-only UTF-8 audit, including untracked files. Python 3.14. '
         'Directory scans include common text extensions; exclude .git, node_modules, .venv and __pycache__. '
         'No Git/base filter, network, writes, YAML validation, length checks or safety certification. '
         'Links: inline/reference definitions, ATX headings and HTML IDs; not a complete Markdown renderer. '

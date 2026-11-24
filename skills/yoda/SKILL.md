@@ -258,7 +258,7 @@ well-formed. You have not established that it is safe, and saying otherwise is t
 step exists to prevent. Safety needs tooling that scans for invisible codepoints, and provenance
 — who wrote it, from where.
 
-Run the bundled read-only scanner with Python 3.10 or later. Resolve the script from this
+Run the bundled read-only scanner with Python 3.14. Resolve the script from this
 installed skill's directory; pass the library root, not just tracked or changed files:
 
 ```bash
