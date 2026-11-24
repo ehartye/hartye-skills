@@ -55,6 +55,11 @@ Wiki-backed skills target wiki-master 0.89.0 or later and its six-role catalog.
 
 ## Version notes
 
+### 0.13.1
+
+Python 3.14 is the only supported version for yoda's bundled scanner, and its CI runs on 3.14. The
+scanner's behavior is unchanged.
+
 ### 0.13.0
 
 Adds three thinking skills: brief-me (a context-only report, then a research offer), challenge (a
