@@ -1,259 +1,260 @@
 ---
 name: spec-plan
-description: Produces wiki-grounded specifications and reviewable plans for one or more changes, with standard or enhanced rigor.
-when_to_use: Use when asked to spec, scope or write up features, changes or spikes before building them; to preload specs on the roadmap; or to plan one or more ready specs, including "/plan the spec" and "/plan the ready specs".
-argument-hint: "[rigor=standard|enhanced] [request]"
+description: Writes and plans wiki-grounded specs with self-review, blind sanity checks, test-first self-certified development and independent hardening rounds.
+argument-hint: "[hardening=N] [request]"
 disable-model-invocation: true
 ---
 
-# Spec and Plan
+# Spec and plan with hardening
 
-Turn the user's intent into a settled specification, then a plan ready for handoff. This
-skill uses wiki-master for project grounding and saving the spec, and assumes subagents
-are available. Implementation belongs to the subsequent workflow, so finish at handoff.
+Turn the user's intent into settled specs, then into a plan ready for handoff. This skill depends
+on the **wiki-master** plugin to ground the work and to save specs, and it assumes subagents are
+available. It finishes at handoff. The plan carries a self-contained execution contract (the
+test-first triples, the hardening rounds, the finding classes, remediation, stopping and delivery)
+that the executor follows.
 
-## Prerequisites
+## Arguments
 
-Use wiki-master in both stages to ground the work. Create and update specs outside the host's
-plan mode so they can be saved. Normally plan ready specs inside the host's Plan mode.
-When that mode is unavailable or the user delegates non-interactive planning, use the
-authorized delegated path below. Otherwise, if the host is in the wrong mode for the
-requested stage, stop that stage and explain what must change before resuming. If
-wiki-master is unavailable, stop the affected stage; delegation does not replace grounding.
-Check the mode for the stage being performed, not the next stage at handoff. Finishing a
-spec in Default mode is expected; it does not block handing it off to `/plan`.
+- `hardening=N` may appear anywhere in the arguments or in the planning request (for example
+  `/plan the spec hardening=3`); the rest is the request.
+- N is a non-negative integer: the most hardening rounds the plan allows for each build spec.
+- When it is omitted, N is **2**. The value comes only from the argument or this default; a spec
+  never carries a round count. Record N in the plan.
 
-### Authorized delegated planning
+## Who writes what
 
-Use this path only with explicit user authorization to plan outside Plan mode or to carry
-out delegated planning without the user present. Reuse authorization already in the
-conversation or supplied delegation; record its source and scope. Being in Default mode,
-having todo tools, a request to implement, or user silence does not by itself authorize
-this exception. Without it, report the Stage 2 mode blocker and the authorization or mode
-change needed. Normal Plan-mode planning needs no additional delegation record or ceremony.
-
-Follow the same Stage 2 procedure and selected rigor. Keep exploration read-only and write
-only planning artifacts and task tracking during this stage. Record the actual host mode,
-why this path applies, and user-delegated assumptions in the plan. Settle consequential
-scope, behavior, interface, dependency, acceptance and authorization choices through existing
-answers or explicitly delegated decision authority. If a choice remains outside that
-authority, mark the affected work blocked and ask for the decision; absence is not an answer.
-Continue independent ready work without claiming the blocked scope is ready for handoff.
-
-Save the complete plan in a durable, permitted artifact and link it at handoff. Use the
-project's plan location when defined, otherwise a named Markdown file in the task workspace.
-Project its steps into regular todos with stable task IDs, source spec/package references,
-dependencies and status. If the host has no todo support, keep an explicit task table or
-checklist with those fields in the saved plan. Keep the projection synchronized with the
-plan, including TDD pairs and review gates; todos are not a substitute for its briefs,
-acceptance criteria, constraints or decision record. Do not mark implementation or validation
-complete merely because it has been planned. If persistence is blocked, report that blocker
-and do not claim the delegated handoff is complete.
-
-Planning authorization is distinct from execution authorization. Carry actual prior execution
-authority and its limits into the handoff; do not require fresh approval solely because the
-user is away. The skill ends at handoff, after which the subsequent workflow may proceed
-within that existing authority. Planning, plan completion, delegated assumptions and silence
-never grant execution permission. Preserve host restrictions and actual permission, safety
-and review gates, including any explicit requirement for plan approval before execution.
-
-## Rigor
-
-Accept `rigor=standard` or `rigor=enhanced` anywhere in the arguments; the remainder is the
-request. Carry the selected rigor from the spec into the plan unless the user changes it.
-For a new spec, default to `rigor=standard` when omitted and record it without asking the user.
-**Standard** uses the spec and plan procedures below. **Enhanced** adds the fresh-agent
-spec review and enhanced planning (test-driven development tasks and work-package reviews)
-described in their respective sections.
-The user may select either enhancement individually; record the selection and its reason.
-For a batch, use the requested rigor or the standard default for new specs and record any per-spec
-choices. Preserve each saved spec's rigor when planning a set unless the user changes it.
+- **You, the orchestrator, write every spec.** Draft, revise and save each one yourself, in your
+  own context, through wiki-master:wiki-project. You also write every other authored project
+  page: backlog items, `specced-in` keys and the backlog entries logged from hardening.
+- **Subagents only gather evidence or review:** wiki search, research and ingestion, read-only
+  code exploration, the sanity check and hardening reviews. They return reports and never write
+  specs.
+- **Research and ingestion run one worker at a time**, through wiki-master:wiki-researcher, and
+  write evidence pages only.
 
 ## Stage 1: Spec
 
-**Preload one or more specs.** Use the project's existing wiki backlog as the queue. Give
-each independent goal its own saved spec and apply this stage to every requested goal,
-reusing shared interview answers while settling each spec's own decisions. Complete the
-requested batch before the final handoff; creating or reviewing specs prepares the queue
-for later planning. Specs can also accumulate across sessions. Record dependencies as links
-to other specs with the required outcomes or interface contracts, so later planning can
-order them without relying on conversation memory.
+Give each independent goal its own saved spec, and apply this stage to every requested goal.
+Record dependencies between specs as links with the required outcome or interface contract.
 
-1. **Shape the requested spec.** Use the [spec template](references/spec-template.md),
-   including the sections that help settle a decision or make the outcome checkable.
-   Scale the detail to the change so even a small spec stays useful and concise.
-2. **Interview around the missing decisions.** Reuse answers and authorization already in
-   the conversation. Ask remaining questions in small batches of two to four, or fewer when
-   fewer remain or the question tool has a lower limit. Give recommended defaults. Cover the
-   goal and user-visible outcome, scope, constraints, acceptance, build versus spike, and
-   applicable delivery requirements and authorization. Record the default or requested rigor.
-   Wait for answers before drafting dependent content; when the user delegates a choice,
-   record the chosen default as an assumption. Small batches make decisions easier to answer.
-3. **Ground the request in the wiki.** Find the project through its overview's `repo:` field;
-   ask for the project slug if needed. Delegate a search using wiki-master:wiki-search for
-   relevant knowledge and roadmap items. Report coverage and gaps. When coverage is light,
-   propose wiki-master:wiki-researcher for topic discovery and ingestion of the resulting named
-   clippings for those gaps, using existing authorization where given. Grounding keeps the spec
-   connected to prior decisions.
-4. **Settle roadmap overlap with the user.** Recommend adopting a matching item, grouping
-   related items with the same goal as work packages, or linking out-of-scope items as
-   non-goals. Ask about unresolved conflicts. Give independent goals separate specs. Keep
-   absorbed items discoverable with `specced-in: ["[[<spec>|WPn]]"]` in their frontmatter.
-5. **Explore the code read-only through subagents.** Establish real files, interfaces,
-   commands and current behavior. Keep the findings that affect design or acceptance.
-   Have exploration identify the available project skills and plugins that fit the work;
-   propose them together in one structured question, each with a reason and relevant
-   packages, and record the user's confirmed selection. Use further interview batches for
-   decisions the evidence raises. Concise reports preserve the orchestrator's context for
-   decisions rather than repository traversal.
-6. **Choose review depth deliberately.** Recommend enhanced spec rigor when assumptions,
-   consequential constraints or complex requirements need an independent reading. Recommend
-   enhanced plan rigor for packages involving shared contracts, security, data handling,
-   concurrency or changes that are hard to reverse. Put applicable suggestions together in
-   one interview question; carry forward accepted and declined choices so the user decides
-   each once. Enhanced rigor already selects both enhancements.
-7. **Turn experimental unknowns into a spike spec.** State risk-ordered Given/When/Then
-   questions, observable results, and validated, partial or invalidated verdicts with
-   deliverables and promote-or-discard criteria. Use the user's effort budget when supplied;
-   otherwise state "no timebox; stops at the first met exit criterion". The deliverable here
-   is the experiment's specification, which makes its eventual result useful to the next decision.
-8. **Resolve the spec's decisions and check its criteria.** Apply the decision and spike
-   checks under Spec handoff before saving. Record user-delegated choices as explicit
-   assumptions. For each acceptance criterion, open the artifact or template
-   it reads and record what it can actually show; write the criterion at that level. Where
-   an artifact is new, identify its planned shape and observable result explicitly. This ties
-   acceptance to evidence a later reader can obtain.
-9. **Save the specification.** Use wiki-master:wiki-project to save it at
-   `wiki/authored/<project>/backlog/<slug>.md`, with `kind: backlog-item` and
-   `backlog-status: planned`. Write outcomes and high-level design, with acceptance expressed
-   as runnable commands and expected output or repeatable observations. Give work packages
-   clear ownership, dependencies and self-contained briefs. Include applicable delivery
-   requirements as planned work, using the project's procedure and settled authorization.
-   Record rigor, any stage-specific selections, confirmed tools and the corresponding package
-   Tools lines. Persistence gives the planner a stable starting point.
-
-### Enhanced spec rigor
-
-Review the saved draft before handing it to planning. Start a **fresh agent for this review
-alone**, separate from the spec author and orchestrator, with the user request, interview
-decisions, saved spec path and relevant evidence. An independent reading can catch assumptions
-the author has become accustomed to.
-
-Ask the reviewer to check that the spec captures the user's decisions, accurately describes
-the existing code, resolves dependencies and makes acceptance observable. Have it inspect the
-referenced artifacts and check acceptance commands that are safe and meaningful before a build;
-record expected baseline failures and checks that require future work as such. The review
-returns findings with evidence and locations, plus PASS or changes needed. The author revises
-the spec and obtains a fresh-agent recheck of confirmed findings. Questions that need the
-user's decision return to the interview. Record the review outcome and any pending findings
-in the spec's Rigor section so planning inherits the actual state of review.
+1. **Shape the spec.**
+   - Use the [spec template](references/spec-template.md), keeping the sections that settle a
+     decision or make the outcome checkable. Scale the detail to the change.
+   - Decide early whether it is a build or a spike (step 6).
+2. **Interview around the missing decisions.**
+   - Reuse answers and authorization already in the conversation.
+   - Ask the rest in batches of two to four questions, each with a recommended default.
+   - Cover the goal and user-visible outcome, scope, constraints, acceptance, build versus spike,
+     and delivery requirements and authorization.
+   - Wait for answers before drafting what depends on them. Record a choice the user delegates as
+     an assumption.
+3. **Ground the request in the wiki before drafting.**
+   - Find the project through its overview's `repo:` field, or ask for the project slug.
+   - Have a subagent search with wiki-master:wiki-search for relevant knowledge and roadmap items.
+   - Report the coverage and the gaps to the user.
+   - For the gaps, propose a wiki-master:wiki-researcher round that discovers sources and ingests
+     them, or run it under authorization the user already gave. Draft only after it returns or
+     the user declines it.
+4. **Settle roadmap overlap with the user.**
+   - Recommend adopting a matching item, grouping related items with the same goal as work
+     packages, or linking out-of-scope items as non-goals. Ask about unresolved conflicts.
+   - Mark each absorbed item yourself with `specced-in: ["[[<spec>|WPn]]"]` in its frontmatter.
+5. **Explore the code read-only through subagents.**
+   - Establish real files, interfaces, commands, current behavior and the project's stated
+     implementation and quality rules. Keep findings that affect design or acceptance.
+   - Have exploration name the project skills and plugins that fit. Propose them in one question,
+     each with a reason and its packages, and record the user's confirmed selection.
+   - Take decisions the evidence raises back to the interview.
+6. **Shape a spike when the change is an experiment.**
+   - State risk-ordered Given/When/Then questions with observable results.
+   - Give validated, partial and invalidated verdicts, each with its deliverable and its promote or
+     discard criterion.
+   - Use the user's effort budget, or "no timebox; stops at the first met exit criterion" when
+     none is given.
+   - A spike keeps grounding, self-review and the sanity check, but skips TDD, certification and
+     hardening, because its deliverable is a verdict with evidence.
+   - Promoted work gets its own build spec.
+7. **Draft and save the spec yourself.**
+   - Write it from the interview, grounding and exploration evidence, using subagent reports as
+     inputs, never as drafts.
+   - Record decisions as statements and delegated choices as assumptions.
+   - Write each acceptance criterion as a runnable command with expected output, or a repeatable
+     observation, at the level its artifact can actually show.
+   - Give work packages ownership, dependencies, self-contained briefs and Tools lines, with
+     delivery as a planned package where the scope needs it.
+   - Save it with wiki-master:wiki-project at `wiki/authored/<project>/backlog/<slug>.md`, with
+     `kind: backlog-item` and `backlog-status: planned`.
+8. **Self-review the saved draft, before the sanity check.**
+   - Re-read it as saved and check four things: every decision is settled, each acceptance
+     criterion can be observed from its artifact, existing and new behavior are labeled as such,
+     and every work package can start from its brief alone.
+   - Fix what you find in the spec's text, and save.
+   - Keep the self-review's record out of the spec until the sanity check returns, so the checker
+     never reads it. Write that record at step 10.
+9. **Run the blind sanity check.**
+   - **Give a fresh subagent that has not seen this work only** the user's request verbatim, the
+     saved spec's path, and read-only access to the repository and the wiki.
+   - **Withhold** the self-review notes, the interview rationale and your own conclusions.
+   - **Ask it to disagree**, through three broad lenses: (a) a false premise (are we thinking
+     about this wrong?), (b) an architectural anti-pattern, over-engineering, or a KISS or YAGNI
+     breach, and (c) blind spots (things not considered at all).
+   - Say it is a broad-strokes check, not a line-by-line review of process or wording.
+   - Ask for a few points, each with its reason and what it would change, and accept "No concerns"
+     as a valid result.
+10. **Triage the sanity check and record the review.** Its advice is not a directive.
+    - Adopt the points you agree with by revising the spec.
+    - Present every point you disagree with to the user, with its position, yours and a
+      recommendation. The user decides, not you.
+    - Now record the self-review outcome, the adopted points, the disputed points and the user's
+      decisions in the Review section, and save.
 
 ### Spec handoff
 
-**Settle decisions before handoff.** Confirm that a fresh agent can begin each work package
-without needing another decision about scope, behavior, interfaces, dependencies, acceptance
-or authorization. Resolve those decisions with the user and record the answers as statements.
-Replace placeholders, open questions and "decide during implementation" instructions with
-settled choices. Keep routine implementation details within those choices for the implementing
-agent to determine.
-
-**Make spike uncertainty explicit.** A spike may contain questions it is designed to answer.
-Settle the experiment's method, observable outcomes and exit criteria before handoff. When
-its findings determine a later build decision, plan the spike first and complete the affected
-build plan after its verdict.
-
-Confirm that decisions, tools and rigor selections are recorded and any selected spec review
-has passed, or that the user has explicitly changed the selection. For a batch, apply these
-checks independently to each spec, with a fresh reviewer for each selected spec review.
-Link the saved specs and summarize each scope and whether it is ready for planning. Identify
-any draft still awaiting a decision or review separately; readiness follows from these checks,
-not a new backlog status. If planning is already requested and the delegated path is authorized,
-continue into Stage 2 for the requested ready specs. Otherwise close with
-"When you're ready, tell me `/plan the spec`." For a set,
-use "When you're ready, tell me `/plan the ready specs`, or name the specs you want planned."
-Where `/plan` enters the host's Plan mode, that command is the complete next action. Do not
-prepend a separate instruction to switch modes or describe the current Default mode as a
-blocker to this handoff. Check Stage 2's mode prerequisite when planning actually begins.
+- **Settle decisions.** A fresh agent must be able to begin each work package without another
+  decision about scope, behavior, interfaces, dependencies, acceptance or authorization. Replace
+  placeholders and "decide during implementation" with settled choices; leave routine details to
+  the implementer.
+- **Settle a spike's method.** Its questions may stay open, but its method, observable outcomes
+  and exit criteria are settled. When its verdict decides a later build, plan the spike first.
+- **Check the Review section.** It records the self-review, the sanity-check points adopted and
+  disputed, and the user's decisions. A spec still waiting on one of these is not ready.
+- **Close.** Link the saved specs and say which are ready. If planning was requested and the
+  delegated path below is authorized, continue into Stage 2. Otherwise end with "When you're
+  ready, tell me `/plan the spec`."
 
 ## Stage 2: Plan
 
-1. **Select the ready specs.** Find queued backlog items with a `For the planner` section
-   and status planned or in-progress. Use the named specs, the sole ready spec, or all ready
-   specs in the current project when the user asks for that set. Otherwise list the ready
-   candidates with their scope and rigor and ask which to plan together, supporting multiple
-   selections. Read each spec's decisions, dependencies and Rigor section and recheck the
-   handoff conditions against the current repository. A saved draft or planned status alone
-   establishes neither settled decisions nor a passed review. Report pending candidates and
-   their reasons separately. For an explicitly requested spec with gaps or an affected review,
-   return to Stage 1 outside plan mode to settle and save it before resuming planning through
-   the applicable path. For in-progress specs, establish the remaining scope from recorded results and
-   preserve ongoing work.
-2. **Reconcile the selected set.** Resolve cross-spec contradictions, dependency cycles,
-   missing prerequisites and shared-interface decisions through Stage 1 outside plan mode,
-   updating affected specs and reviews before resuming through the applicable planning path. A prerequisite
-   may be an already verified result or another selected ready spec with a settled output
-   contract. A build decision depending
-   on an unresolved spike waits for its verdict. Produce one combined plan with a section per
-   spec, in the user's selected order where dependencies permit; state any required reordering.
-   Keep specs sequential, with parallel groups inside each spec, so later work can account
-   for earlier changes to shared files. This preserves separate goals while coordinating them.
-3. **Translate packages into concrete steps.** Name each source spec and its selected rigor.
-   Qualify package IDs with the spec slug, such as `csv-export/WP1`, so dependencies and review
-   findings identify the right package across the set. Preserve each spec's acceptance criteria.
-   Carry each package's brief, owned files, dependencies, done-when and confirmed tools into
-   its plan step. Add technical steps appropriate to the current code and the spec's scope.
-   Include applicable verification and delivery requirements from the spec as future work.
-   Plan through the project's definition of done: include delivery, verification,
-   synchronization, evidence capture, and workspace cleanup as explicit tasks, so completion
-   leaves no administrative loose ends.
-   Apply the Enhanced plan rigor section below to every package selected for review.
-   Keep each step traceable to a requirement or package so the user can assess coverage.
-4. **Plan delegation around context and dependencies.** Default to subagents for work
-   packages, scheduling independent packages in parallel and passing self-contained briefs.
-   Specify concise reports of changed artifacts, checks and blockers so the orchestrator
-   preserves context for coordination. Give concurrent packages disjoint file ownership;
-   sequence shared-file changes and dependencies explicitly. When tight coupling or another
-   concrete constraint demands a different approach,
-   state the exception and its reason in the plan. This makes parallelism purposeful.
-5. **Make the plan reviewable and hand it off.** Check that the plan covers every selected
-   spec's acceptance criteria, settled constraints and selected rigor. Apply the same decision and
-   spike checks from Spec handoff to the resulting plan, so each package can begin with its
-   execution-informing decisions settled. In Plan mode, present the plan in the reply using
-   the host's plan format, or a designated plan artifact the host permits writing in plan mode.
-   On the delegated path, save and link the complete plan and its task projection as described
-   above. State what was planned, what was actually checked, remaining blockers and the next
-   action under the recorded execution authority. Only when the applicable checks pass, end with
-   "The spec and plan are ready for handoff," or "The selected specs and combined plan are
-   ready for handoff." This completes the skill's scope; the saved specs remain available
-   for later use and their backlog status stays unchanged by planning.
+**Mode.** Plan ready specs in the host's Plan mode. Plan outside it only on the delegated path:
+the user explicitly authorizes planning outside Plan mode or without being present. Default mode,
+a request to implement or silence is not that authorization. On the delegated path:
 
-### Enhanced plan rigor
+- record the actual host mode and the source and scope of the authorization;
+- save the complete plan as a durable Markdown artifact (the project's plan location, or a named
+  file in the task workspace) and project its steps into todos, or a task table in the plan, with
+  stable IDs, dependencies and status;
+- treat planning authorization as separate from execution authorization, and carry only the
+  execution authority the user actually gave.
 
-Plan **test-driven development (TDD)** by adding a separate TDD task immediately before
-every development task. Assign each pair to the **same developer or implementing agent**,
-including when a package contains multiple development tasks. The TDD task writes tests
-for the intended behavior and runs them to confirm the expected failure before implementation
-starts. Make the development task depend on that result; it makes the tests pass, then
-refactors while keeping them green. Keep each pair together when scheduling parallel work;
-do not delegate test creation and implementation to different agents. These are planned
-tasks for the subsequent implementation workflow, not tests to run during planning.
+Without that authorization, stop the stage outside Plan mode and say what must change. Spec edits
+are saved outside Plan mode.
 
-Build **fresh-agent work-package review into the plan**, after each package's work and before
-dependent packages consume it. These are scheduled reviews of the eventual work products;
-this stage produces their briefs and placement in the plan.
+1. **Select the specs.**
+   - A ready spec has a For the planner section and status planned or in-progress.
+   - Plan the named specs, the sole ready spec, or all ready specs when asked. Otherwise list the
+     candidates and ask.
+   - Recheck each one's decisions and handoff conditions against the current repository.
+2. **Reconcile the set into one plan.**
+   - Send gaps, contradictions and shared-interface conflicts back to Stage 1 before planning them.
+   - Produce one combined plan with a section per spec, qualifying package IDs with the spec slug,
+     such as `csv-export/WP1`.
+   - Keep specs sequential, with parallel groups inside each spec.
+   - A build that depends on an unresolved spike waits for its verdict.
+3. **Review a spec that arrives without a review record.**
+   - When a selected spec lacks a record of either a self-review or a sanity check, as with a spec
+     written by another workflow, run whichever is missing before planning it: Stage 1 step 8 for
+     the self-review, steps 9 and 10 for the sanity check. Do not ask whether to.
+   - Save the outcome to its Review section, outside Plan mode, then resume planning. When only
+     the self-review was missing, record it there directly.
+   - Disputed points wait for the user's decision, and the spec is planned only after it.
+4. **Plan each build development task as a triple.**
+   - Carry the package's brief, owned files, dependencies, done-when and confirmed tools into the
+     plan.
+   - Assign the whole triple to **one developer agent**:
+     - **TDD:** write the tests for the intended behavior, run them, and confirm the expected
+       failure.
+     - **Dev:** make them pass, then refactor while they stay green.
+     - **Certification:** the developer self-certifies that all relevant tests pass and that its
+       assigned acceptance criteria are met.
+   - Relevant tests are the project's full test command where one exists, otherwise the package's
+     new tests plus its acceptance commands.
+5. **Define the certification evidence.**
+   - It is the **raw test-runner output**, a **diff of the test files since the red step**, and an
+     **explicit flag** for any test changed after red or that the developer believes contradicts
+     the spec.
+   - Nobody re-runs the checks at certification. Hardening reviewers see the same evidence.
+6. **Keep spikes out of the triple.** Spike packages get no TDD, certification or hardening. They
+   deliver the verdict and its evidence.
+7. **Write the hardening contract into the plan** for each build spec, using the
+   [hardening contract](#hardening-contract) below.
+   - Record N and place up to N rounds after all of that spec's development packages are
+     certified and before its delivery package.
+   - When N is 0, plan no rounds, and state in the plan and in the handoff: "No independent review
+     of the self-certified work will happen."
+8. **Plan delegation and delivery.**
+   - Default to a subagent per package, running independent packages in parallel with
+     self-contained briefs and concise reports of changed files, checks and blockers.
+   - Give concurrent packages disjoint file ownership. Sequence shared-file changes and
+     dependencies explicitly, and state the reason for any exception.
+   - Include delivery, verification, synchronization, evidence capture and workspace cleanup as
+     explicit tasks.
+9. **Hand off.**
+   - Check that the plan covers every selected spec's acceptance criteria and constraints, and
+     apply the Spec handoff decision checks to it.
+   - In Plan mode, present the plan in the host's plan format. On the delegated path, link the
+     saved plan and its task projection.
+   - State what was planned, what was actually checked, the hardening value per spec (with the
+     zero-round warning when N is 0), remaining blockers and the next action under the recorded
+     execution authority.
+   - When the checks pass, end with "The spec and plan are ready for handoff," or "The selected
+     specs and combined plan are ready for handoff." Planning leaves backlog status unchanged.
 
-For each package, specify a new reviewer distinct from its author and the orchestrator,
-given the package brief, relevant spec criteria and resulting artifacts. Ask that reviewer
-to check correctness, scope and acceptance against the artifacts, with evidence-linked
-findings. Keep the author's conclusions separate from the review inputs so the reviewer
-forms an independent assessment. State that confirmed findings need resolution and a fresh
-review before dependent work proceeds. For a delivery package, place the review of prepared
-delivery artifacts before the outward-facing action. This review dependency makes enhanced
-rigor part of the work plan rather than a vague promise of extra care.
+## Hardening contract
+
+Copy this contract into each build spec's section of the plan. The executor follows it.
+
+**Rounds.** Rounds run per spec, after its development packages are certified and before its
+delivery package. N is a ceiling, not a quota. The plan holds a hardening log (in the saved plan,
+or in the host's plan in Plan mode) so each round can read earlier dispositions.
+
+**Reviewer.** Each round uses a fresh independent subagent: not a developer, not the orchestrator,
+and not an earlier round's reviewer.
+
+- Give it the spec, its acceptance criteria, the stated project and quality rules, the resulting
+  artifacts and diff, and the certification evidence.
+- Never give it the developers' narrative conclusions.
+- It returns findings, each with a class, evidence and a location. "No findings" is a valid result.
+
+**Classes.** A borderline finding, or one the reviewer labels with two classes, takes the higher.
+
+| Class | Test |
+| ----- | ---- |
+| **IMMINENT** | Definite data loss, a business-continuity risk, or a terrible user experience. |
+| **COMPLIANCE** | Delivered without following the spec, the supplied requirements, or the implementation or quality rules known to apply. |
+| **BEST-PRACTICE** | Any relevant business or technology expert would agree a good solution would not behave this way. |
+| **EDGE** | Clearly a good idea, but neither a show-stopper nor an MVP element. |
+
+**Triage.** The orchestrator verifies every finding against its evidence.
+
+- IMMINENT and COMPLIANCE findings are always fixed.
+- Before refuting or downgrading one, present it to the user with the evidence and wait for the
+  decision. Do not act on a refutation alone.
+- Weigh each BEST-PRACTICE and EDGE finding against its risk and its fit with current objectives.
+  Fix it, or log it yourself to the project's wiki backlog through wiki-master:wiki-project.
+  Record the reason either way.
+- Enter every disposition in the hardening log: round, finding, class, verification, disposition,
+  reason and any backlog link.
+
+**Remediation.** Every fix follows the same TDD, dev and certification triple.
+
+- The original developer agent makes it where it is still available, continued in place with its
+  context intact (for example through SendMessage).
+- Otherwise a fresh developer agent makes it, given the original package brief, that package's
+  certification evidence and the findings.
+- The new certification evidence goes to the next round.
+
+**Stopping.**
+
+- **Early stop:** after a round with no IMMINENT or COMPLIANCE findings, once its BEST-PRACTICE
+  and EDGE items are dispositioned, stop hardening and go to delivery, even if rounds remain.
+- **Otherwise** the next round reviews the fixed work.
+- **Rounds used up:** continue to delivery, unless another round is VERY LIKELY to surface further
+  IMMINENT items. Evidence of that: the final round found an IMMINENT item, or an IMMINENT fix
+  landed in code no later round has reviewed.
+- **In that case, pause before delivery**, state the evidence, and ask the user for more rounds or
+  for permission to deliver.
 
 ## Evidence
 
-Read [the evidence reference](references/evidence.md) when a rule needs justification or the
-skill is being revised. It preserves the supporting synthesis, source links and limitations.
-The stage boundaries and the two enhanced rigor contracts are workflow choices; the sources
-support their rationale rather than establishing this exact procedure experimentally.
+Read [the evidence reference](references/evidence.md) when a rule needs justifying or the skill is
+being revised. The stage order, the sanity-check lenses, the finding classes and the stopping rules
+are workflow choices; the sources support their rationale rather than prove this exact procedure.

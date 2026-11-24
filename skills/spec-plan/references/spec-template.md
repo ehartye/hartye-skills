@@ -1,12 +1,12 @@
 # Spec template
 
-Save as `wiki/authored/<project>/backlog/<slug>.md`. Replace guidance with settled content,
-keeping the sections that help a fresh planner understand the goal and make a concrete plan.
-Before handoff, settle decisions about scope, behavior, interfaces, dependencies, acceptance
-and authorization, and record them as statements. Replace placeholders and open questions with
-settled choices; leave routine implementation details within those choices to the implementer.
-For multiple goals, save one spec per goal in the same backlog. Each spec retains its own
-decisions, rigor and acceptance criteria so it can be planned alone or in a selected set.
+Save each spec as `wiki/authored/<project>/backlog/<slug>.md`, one spec per independent goal.
+Replace the guidance with settled content and keep the sections that help a fresh planner
+understand the goal and plan it. Before handoff, record decisions about scope, behavior,
+interfaces, dependencies, acceptance and authorization as statements, not open questions. Leave
+routine implementation details to the implementer.
+
+The spec carries no hardening round count. That is a planning argument.
 
 ```markdown
 ---
@@ -23,66 +23,67 @@ backlog-status: planned
 # <Imperative title: what changes for the user>
 
 ## Goal
-State the goal and the user-visible outcome. Distinguish existing behavior from the change.
-State the spec's intended lifetime: a planning input, a maintained companion to the code,
-or the standing source of truth.
+State the goal and the user-visible outcome. Label existing behavior and the change separately.
+State the spec's intended lifetime: a planning input, a maintained companion to the code, or the
+standing source of truth.
 
-## Rigor
-Rigor: <standard | enhanced>
-Spec review: <selected | not selected>; outcome: <pending | passed, with evidence>
-Planned work-package review: <all packages | selected WP ids | not selected>
-Stage-specific choices: <accepted or declined enhancements and the user's reason, if any>
+## Review
+Pending.
 
-Enhanced selects both enhancements. Record the actual spec-review outcome before handoff;
-the plan carries a TDD task immediately before every development task, with the same developer
-owning each pair, and work-package reviews as future review steps.
+Keep this section at "Pending." until the sanity check returns, so the checker never reads the
+self-review. Fill it in after the sanity check returns, at triage:
+
+Self-review (<date>): <outcome of the four checks: decisions settled, acceptance observable,
+existing and new behavior labeled, each package startable from its brief; what was fixed>
+Sanity check (<date>, fresh agent): <"No concerns", or the points returned>
+- Adopted: <point; the change made to this spec>
+- Disputed: <point; the reviewer's position; ours; the recommendation given to the user>
+User decisions: <for each disputed point, what the user decided and when>
+
+A spec is ready for planning only when all three lines are filled in and no disputed point is
+waiting for the user.
 
 ## Context
-Record relevant evidence and non-obvious design context, with source links, so the planner
-can distinguish established facts from assumptions.
+Record evidence and non-obvious design context with source links, so the planner can tell
+established facts from assumptions. Note the wiki coverage, the gaps, and any research round that
+filled them.
 
 ## Scope and non-goals
-State the included outcomes and plausible adjacent work outside this change. Link related
-roadmap items that remain separate.
+State the included outcomes and plausible adjacent work that is out of scope. Link related
+roadmap items that stay separate.
 
 ## Absorbed and related items
-Link absorbed items to their work packages. Each absorbed roadmap entry points here with
-`specced-in: ["[[<this spec>|WPn]]"]` in its frontmatter, not a prose line, so it remains
-discoverable. wiki-master 0.95.0 or later validates the key; an older wiki-master ignores it.
+Link absorbed items to their work packages. Each absorbed item carries
+`specced-in: ["[[<this spec>|WPn]]"]` in its frontmatter, so it stays discoverable.
 
 ## Decisions
-List each settled choice with its reason. These decisions let planning focus on concrete steps.
+List each settled choice with its reason.
 
 ## Dependencies
-Link prerequisite specs and name the required outcomes or settled interface contracts. Identify
-already verified prerequisite results where applicable. Include this section when dependencies
-exist. Findings from an unresolved spike inform a later build spec and plan after its verdict.
+Link prerequisite specs and name the required outcome or settled interface contract. Include
+this section when dependencies exist.
 
 ## Assumptions
-Record user-delegated choices explicitly so the user can correct them before the plan depends
-on them. Resolve execution-informing decisions through the interview or a defined spike.
+Record choices the user delegated, so the user can correct them before the plan depends on them.
 
 ## Constraints and authorization
-Record checkable constraints, relevant commands, interfaces, project conventions and a real
-code-style example where useful. Carry forward the project's delivery procedure and the
-user's authorization boundaries so the plan can accurately describe any delivery package.
-When delegated planning is authorized, record the source and scope of that authority separately
-from execution authority, including delegated choices and any approval still required.
+Record checkable constraints, commands, interfaces, and the project's implementation and quality
+rules, which hardening reviewers check against. Carry forward the delivery procedure and the
+user's authorization boundaries. Record any delegated-planning authority separately from
+execution authority.
 
 ## Recommended tools
-List user-confirmed tools as `<name> — <reason>; used by <WP ids>`. These inform the plan's
-package briefs. Include this section when tools have been selected.
+List user-confirmed tools as `<name> — <reason>; used by <WP ids>`. Include this section when
+tools were selected.
 
 ## Acceptance criteria
 Number observable outcomes, each with a runnable command and expected output or a repeatable
-observation. Identify the artifact each criterion reads and what it can show. Distinguish
-existing baseline checks from checks requiring future work. Include relevant failure cases
-and the appropriate project validation commands.
+observation. Name the artifact each criterion reads. Separate checks that pass today from checks
+that need the future work. Include relevant failure cases and the project's validation commands.
 
 ## Work packages
-Group by context boundary. Give each package a self-contained brief, explicit dependencies,
-file ownership and a checkable result. Independent packages with disjoint ownership can be
-planned in parallel; shared-file changes need an explicit sequence.
+Group by context boundary. Independent packages with disjoint ownership can run in parallel;
+shared-file changes need an explicit sequence.
 
 ### Group A — independent
 **WP1: <name>.** Depends on: <none | WP ids>. Owns: <files or directories>.
@@ -94,60 +95,48 @@ Tools: <confirmed tools, when applicable>.
 **WP2: <name>.** Depends on: WP1. Owns: <files or directories>.
 Brief: <self-contained brief>. Done when: <observable result>.
 
-### Delivery — when required by the scope
+### Delivery — when the scope requires it
 **WP-last: Deliver.** Depends on: <required WP ids>.
-Brief: <project-specific delivery requirements and authorization boundaries>.
+Brief: <delivery requirements and authorization boundaries>.
 Done when: <observable delivery outcome>.
 
 ## Verification
-Describe how the eventual result will be checked against acceptance, including integration
-checks and relevant negative cases. This is input to the plan's verification steps.
+Describe how the result will be checked against acceptance, including integration checks and
+negative cases.
 
 ## For the planner
-Carry the package briefs, ownership, dependencies, done-when checks and confirmed tools into
-the plan. Default to subagents for parallel independent work and context preservation, with
-concise reports to the orchestrator; state the reason for any exception. Add the selected
-fresh-agent work-package reviews after package work and before dependent work (before the
-outward-facing action for delivery). Apply the same decision-completeness check to the plan
-before handoff so a fresh agent can begin every package with those decisions settled.
-When selected with other specs, retain this spec's rigor and acceptance criteria in its own
-section of the combined plan. Qualify package IDs as `<spec-slug>/WP-n`, reconcile dependencies
-and shared interfaces across the set, and sequence specs in dependency-compatible selection
-order, with parallel groups inside each spec. Recheck readiness from the saved content and
-review outcome against the current repository when planning begins.
-Use Plan mode normally. With explicit user authorization for delegated planning outside it,
-follow the skill's delegated path: record actual mode, authority and assumptions, save the
-complete plan, and maintain regular todos or a durable task table/checklist as its projection.
-Preserve the same readiness, acceptance, dependencies, TDD pairs and review gates. Carry prior
-execution authority into handoff without expanding it or requiring approval just for absence.
+Carry each package's brief, ownership, dependencies, done-when and tools into the plan. Plan each
+development task as a TDD, dev and certification triple under one developer agent. Plan the
+hardening rounds after the development packages are certified and before delivery. Use subagents
+for independent work with disjoint ownership. Planned with other specs, keep this spec's own
+section, qualify package IDs as `<spec-slug>/WPn`, and reconcile shared interfaces. Use Plan mode
+unless delegated planning outside it is explicitly authorized.
 ```
 
 ## Spike variant
 
-Keep the same grounding, Rigor, dependencies and planner handoff sections. Replace build outcomes and work
-packages with the following experimental design, so planning has a defined decision to support.
+Keep the Goal, Review, Context, Dependencies, Constraints and For the planner sections. Replace the
+build outcomes and work packages with the experiment below. A spike gets the self-review and the
+sanity check, but no TDD, certification or hardening: its deliverable is a verdict with evidence.
 
 ```markdown
 ## Questions to investigate
 State each unknown as Given / When / Then with an observable result, ordered by risk.
 
 ## Budget
-Use the user's stated effort budget. Otherwise: "no timebox; stops at the first met exit criterion".
+The user's stated effort budget. Otherwise: "no timebox; stops at the first met exit criterion".
 
 ## Exploratory work packages
 Use the same brief, dependency, ownership and done-when fields. Name the disposable experiment
-artifacts, the settled experimental method and the evidence each package should produce.
+artifacts, the settled method and the evidence each package produces.
 
 ## Exit criteria
 - **Validated:** <observable result>; deliverable: <finding and evidence>; promote when <criterion>.
-- **Partial:** <what held and what remains>; deliverable: <evidence and smallest next experiment>;
-  promote or discard according to <criterion>.
+- **Partial:** <what held and what remains>; deliverable: <evidence and the smallest next
+  experiment>; promote or discard according to <criterion>.
 - **Invalidated:** <observable result>; deliverable: <evidence and remaining possibilities>;
   discard according to <criterion>.
 ```
 
-Specify which observable condition ends the experiment and how its verdict informs the next
-decision. Investigatory questions belong in the spike; its method, observable outcomes and
-exit criteria are settled before handoff. When findings determine a later build decision,
-plan the spike first and complete the affected build plan after its verdict. The spike spec
-and its plan are the deliverables of this skill.
+Settle the method, the observable outcomes and the exit criteria before handoff. When the verdict
+decides a later build, plan the spike first; promoted work gets its own build spec.
