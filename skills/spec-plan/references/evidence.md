@@ -1,137 +1,308 @@
-# Specs and Plans for Coding Agents
+# Evidence behind spec-plan's design
 
-Adapted from *Specs and Plans for Coding Agents*, the evidence synthesis updated 2026-10-28.
-Source citations have been converted to public URLs; private navigation and vault metadata
-have been removed. Claims and caveats reflect the captured sources, including abstract-only
-papers and vendor reports, rather than a new independent verification of their results.
+*Adapted on 2026-11-08 from a wiki synthesis on specs and plans for coding agents and from wiki
+concept pages on clean-context review, reviewer-writer separation, review finding severity,
+stopping rules for review loops, YAGNI and premortem review, test-first development with coding
+agents, and reward hacking. Citations are converted to public URLs. Private navigation and vault
+metadata are removed.*
 
-**How to use this reference.** This is background evidence, including discussion of downstream
-implementation. The skill's current contract is specification and planning. Its `rigor` naming,
-fresh-agent spec review, scheduled work-package review and handoff boundary are workflow
-choices, not an experimentally established recipe. Section 9 preserves the earlier synthesis's
-recommendations as rationale; the SKILL.md defines the current procedure.
-The current workflow assumes intentional invocation and available subagents; sizing guidance
-informs the artifact's detail within that workflow.
-The authorized delegated planning path is also a workflow choice, not a measured equivalence
-to host Plan mode. It preserves the complete plan, readiness and selected rigor while using
-ordinary task tracking; explicit user authority substitutes only for the mode prerequisite,
-not for grounding, unresolved decisions, host restrictions or execution permission.
+## How to use this reference
 
-An evidence synthesis addressing "how should a coding agent's spec and plan be written and executed". This page weighs and concludes; the evidence sits in the source pages it cites, and where sources disagree that is said rather than resolved. It rests on sources captured in October 2026, many of them abstract-only or vendor-authored, so read it as the best-supported practice, not a measured recipe. Related concepts: Plan Mode (Plan-then-Execute), Spec-Driven Development, Underspecification and Clarification, Context-Centric Task Decomposition, Agent-Verifiable Acceptance Criteria, Spikes and Exit Criteria.
+This file is background rationale. The procedure is defined in `SKILL.md`, and where the two seem
+to differ, `SKILL.md` wins. Read a section here when a step needs justifying, is being challenged,
+or you are deciding whether a case warrants departing from it.
 
-## Summary
+The skill's main choices are **workflow choices, not measured recipes**. No source tested any of
+these as a package:
 
-1. **Match ceremony to size.** The strongest independent source finds heavy spec workflows on small problems cost more than they save ([Böckeler — Understanding Spec-Driven Development, Kiro, spec-kit and Tessl](https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html)); every vendor that documents plan mode also says to skip it for trivial work.
-2. **Resolve ambiguity before writing the plan.** Agents are poor at noticing missing information, and a subpar plan hurts more than none ([Ambig-SWE - Interactive Agents to Overcome Underspecificity in Software Engineering](https://arxiv.org/abs/2502.13069), [From Plan to Action - How Well Do Agents Follow the Plan](https://arxiv.org/abs/2604.12147); both abstract-only).
-3. **Write "done" as something the agent can run.** Every long-run source converges on checkable acceptance criteria per milestone, and on a verifier that is not the builder.
-4. **Keep the plan in a file and the spec short.** Persistent context costs tokens without reliably helping ([Evaluating AGENTS.md — Are Repository-Level Context Files Helpful for Coding Agents](https://arxiv.org/abs/2602.11988)); long runs survive context loss through plan and progress files.
-5. **Split work by context, not by job title, and keep writes un-contended.** Parallelism buys thoroughness, not speed, at several times the tokens (vendor-reported).
-6. **Almost all numbers here are vendor-reported or abstract-only.** Section 8 lists what the sources do not settle.
+- the orchestrator writing every spec itself;
+- a self-review followed by a blind sanity check from a fresh agent;
+- the TDD → dev → certification triple for every development task;
+- a default of 2 hardening rounds;
+- the four finding classes (IMMINENT, COMPLIANCE, BEST-PRACTICE, EDGE);
+- the stopping rule.
 
-## 1. What a good spec contains
+Each section says what the sources measured or stated, and where the skill goes beyond them.
+Abstract-only and vendor-reported evidence is marked.
 
-A spec, in Böckeler's definition, is "a structured, behavior-oriented artifact" in natural language that guides agents; it is distinct from general context such as `AGENTS.md`, which applies to every session ([Böckeler — Understanding Spec-Driven Development, Kiro, spec-kit and Tessl](https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html)). The sources agree on a core and diverge on detail.
+## Spec content, and grounding before drafting
 
-- **The goal and a user-visible outcome first.** The ExecPlan template opens with purpose and the outcome a user will see ([Using PLANS.md for multi-hour problem solving](https://developers.openai.com/cookbook/articles/codex_exec_plans)); Osmani says keep it goal-oriented, "what and why before how" ([How to write a good spec for AI agents](https://addyosmani.com/blog/good-spec/)); spec-kit's templates instruct the model to state what users need and why, not how ([specification-driven-development-sdd](https://github.com/github/spec-kit/blob/main/spec-driven.md)).
-- **Non-goals, hard constraints and a done-when.** The Codex long-run `Prompt.md` holds goals and non-goals, hard constraints (performance, determinism, UX, platform), deliverables and "done when", to freeze the target so the agent does not build something "impressive but wrong" ([Run long horizon tasks with Codex](https://developers.openai.com/blog/run-long-horizon-tasks-with-codex)). Claude Code's guide says the most useful specs are self-contained, name the files and interfaces involved, state what is out of scope, and end with an end-to-end verification step ([Best practices for Claude Code](https://code.claude.com/docs/en/best-practices)).
-- **Osmani's six areas, where relevant:** commands (full, with flags), testing, project structure, code style (one real snippet over paragraphs), git workflow, and boundaries in three tiers (Always do, Ask first, Never do). He attributes the six areas to a GitHub analysis of over 2,500 agent configuration files; that is second-hand and the primary was not captured ([How to write a good spec for AI agents](https://addyosmani.com/blog/good-spec/)).
-- **Only what the agent cannot discover.** Repository context files do not generally raise success and add over 20% cost on average, repository overviews are not helpful, and instructions are followed and useful for non-standard practices ([Evaluating AGENTS.md — Are Repository-Level Context Files Helpful for Coding Agents](https://arxiv.org/abs/2602.11988)). That study is about persistent repository files, so applying it to a per-task spec is this page's extension, not the paper's finding.
-- **Open decisions named, not guessed.** spec-kit mandates `[NEEDS CLARIFICATION]` markers ([specification-driven-development-sdd](https://github.com/github/spec-kit/blob/main/spec-driven.md)); the ambiguity evidence is summarized in section 6.
-- **Existing versus new behavior labeled.** Böckeler saw spec-kit's notes about existing classes treated as a new requirement, producing duplicates ([Böckeler — Understanding Spec-Driven Development, Kiro, spec-kit and Tessl](https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html)).
-- **The right altitude.** Anthropic's planner is told to stay at product context and high-level technical design because granular technical errors in a spec "would cascade into the downstream implementation" ([Anthropic — Harness Design for Long-Running Apps](https://www.anthropic.com/engineering/harness-design-long-running-apps)); its context-engineering post asks for prompts at the "right altitude", neither brittle if-else logic nor vague guidance ([Anthropic — Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)). The ExecPlan pulls the other way (see section 8).
-- **A stated level and lifetime.** Spec-first, spec-anchored or spec-as-source; Böckeler found most tools are spec-first and vague about maintenance ([Böckeler — Understanding Spec-Driven Development, Kiro, spec-kit and Tessl](https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html)).
+**What a spec should hold.** The sources agree on a core:
 
-## 2. What a good plan contains
+- the goal and user-visible outcome first ([OpenAI — Using PLANS.md for multi-hour problem
+  solving](https://developers.openai.com/cookbook/articles/codex_exec_plans);
+  [Osmani — How to write a good spec for AI agents](https://addyosmani.com/blog/good-spec/));
+- non-goals, hard constraints and a "done when", which keep the agent from building something
+  "impressive but wrong" ([OpenAI — Run long horizon tasks with
+  Codex](https://developers.openai.com/blog/run-long-horizon-tasks-with-codex));
+- acceptance written as observable behavior or a runnable command, per milestone (the same two
+  OpenAI sources);
+- existing and new behavior labeled. Böckeler saw notes about existing classes read as new
+  requirements, producing duplicates ([Böckeler — Understanding Spec-Driven
+  Development](https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html)).
 
-Plan files differ more than plan modes do. The artifact structures covered by the captured sources:
+The self-review checks follow from these and the next point: decisions settled, criteria
+observable, existing versus new labeled, and every package startable from its brief alone,
+because subagents start from a clean window ([Anthropic — When to use multi-agent
+systems](https://www.claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them)).
 
-| Artifact | Parts | Lives where | Notable feature | Source |
-|---|---|---|---|---|
-| **PLANS.md "ExecPlan"** (OpenAI cookbook) | One self-contained file: Purpose / Big Picture; Progress; Surprises & Discoveries; Decision Log; Outcomes & Retrospective; Context and Orientation; Plan of Work; Concrete Steps; Validation and Acceptance; Idempotence and Recovery; Artifacts and Notes; Interfaces and Dependencies | Repository, wired in by an `AGENTS.md` pointer | First four sections are mandatory living sections; a novice with only the working tree and this file must succeed | [Using PLANS.md for multi-hour problem solving](https://developers.openai.com/cookbook/articles/codex_exec_plans) |
-| **Codex long-run stack** (OpenAI blog) | Four files: `Prompt.md` (goals, non-goals, constraints, deliverables, done-when); `Plan.md` (milestones, acceptance and validation commands per milestone, stop-and-fix rule, decision notes, intended architecture); `Implement.md` (runbook); `Documentation.md` (status, decisions, how to run and demo, known issues) | Markdown files the agent revisits | Spec, plan, runbook and audit log are separate; one 25-hour run, self-reported | [Run long horizon tasks with Codex](https://developers.openai.com/blog/run-long-horizon-tasks-with-codex) |
-| **Kiro spec** | `requirements.md` (or `bugfix.md`), `design.md`, `tasks.md`; tasks run singly or in dependency waves | `.kiro/specs/`, approval gates by default | Quick Spec skips gates; Plan mode is the lighter in-context alternative (problem statement, requirements, tasks each ending "Demo:") | [Kiro Docs — Specs](https://kiro.dev/docs/specs/), [Kiro Docs — Plan mode](https://kiro.dev/docs/specs/plan/) |
-| **OpenSpec change folder** | `proposal.md`, `specs/` (deltas: SHALL requirements with WHEN/THEN scenarios), `design.md`, `tasks.md`; archived into the live specs | `openspec/changes/<name>/` | Change-scoped, "no rigid phase gates"; README is project-authored | [OpenSpec — Spec-Driven Development for AI Coding Assistants](https://github.com/Fission-AI/OpenSpec) |
-| **Osmani spec areas** | Six areas (commands, testing, project structure, code style, git workflow, boundaries) plus success criteria and an index for large specs | A `SPEC.md` kept in the repo | A checklist of contents, not a fixed file layout | [How to write a good spec for AI agents](https://addyosmani.com/blog/good-spec/) |
-| **spec-kit** | Constitution, then `spec.md`, `plan.md` (with research, data model, contracts), `tasks.md` with `[P]` for parallelizable tasks | A branch and folder per spec | Constitution gates in the plan template; a design doc, no outcomes reported | [specification-driven-development-sdd](https://github.com/github/spec-kit/blob/main/spec-driven.md) |
-| **Anthropic long-run harness** | `init.sh` to start the app, a progress log, an initial git commit, and a JSON feature list with a `passes` field | Repository | Agent may flip `passes`, not edit criteria; vendor-reported, qualitative | [Anthropic — Effective Harnesses for Long-Running Agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) |
+**Open decisions must be named, not guessed.** Agents are poor at noticing missing information,
+and interaction to resolve it improves outcomes ([Ambig-SWE](https://arxiv.org/abs/2502.13069);
+abstract-only). spec-kit mandates explicit `[NEEDS CLARIFICATION]` markers
+([spec-kit](https://github.com/github/spec-kit/blob/main/spec-driven.md)). A subpar plan hurts
+more than no plan ([From Plan to Action](https://arxiv.org/abs/2604.12147); abstract-only), so
+the cost of a wrong premise compounds downstream.
 
-What the plans agree on, across these:
+**Grounding before drafting** is a workflow choice that follows: if the agent will not notice
+gaps itself, the search for what is known and missing must precede the draft.
 
-- **Make the plan the restart point.** The ExecPlan requires that work can always restart from the plan alone; Anthropic's harness pairs a progress file with git history as cross-session memory; the Codex stack adds a status file so the author "can step away for hours". Kiro's Plan mode keeps its plan in conversation context and Cursor saves plans outside the workspace by default, so those plans do not survive a reset or reach teammates unless saved ([Kiro Docs — Plan mode](https://kiro.dev/docs/specs/plan/), [Cursor Docs — Plan Mode](https://cursor.com/docs/agent/planning)).
-- **Milestones that verify themselves.** Small enough to complete in one loop, each with acceptance and validation commands, and a rule to repair a failed validation before moving on ([Run long horizon tasks with Codex](https://developers.openai.com/blog/run-long-horizon-tasks-with-codex)); each independently verifiable ([Using PLANS.md for multi-hour problem solving](https://developers.openai.com/cookbook/articles/codex_exec_plans)).
-- **Review the plan, not only the diff, but keep it reviewable.** HumanLayer says a bad plan line yields hundreds of bad code lines ([HumanLayer - Advanced Context Engineering for Coding Agents](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/ace-fca.md), self-reported); a low-quality secondary summary of its later talk reports long plans were low-leverage to review and the team moved to a roughly 200-line design discussion and two-page outline ([HumanLayer - Evolution from RPI to CRISPY - ZenML LLMOps Database](https://www.zenml.io/llmops-database/evolution-from-rpi-to-crispy-multi-stage-workflow-for-production-coding-agents)). Cursor's docs advise reverting and sharpening the plan rather than patching a wrong run, since the hard part "is often figuring out what change should be made" ([Cursor Docs — Plan Mode](https://cursor.com/docs/agent/planning)).
-- **List dependencies.** Kiro derives parallel waves from an explicit dependency graph, and Osmani says the spec should note dependencies ([Kiro Docs — Specs](https://kiro.dev/docs/specs/), [How to write a good spec for AI agents](https://addyosmani.com/blog/good-spec/)).
-- **Do not pad it.** A subpar plan hurts more than none, extra early phases can hurt when they do not match the model's own strategy, and periodic plan reminders reduce violations ([From Plan to Action - How Well Do Agents Follow the Plan](https://arxiv.org/abs/2604.12147); abstract only, reminder interval and format not given).
+**Why the orchestrator writes.** Cognition reports that multi-agent systems work best "when
+writes stay single-threaded and the additional agents contribute intelligence rather than
+actions" ([Cognition — Multi-agents: what's actually
+working](https://cognition.com/blog/multi-agents-working)). Anthropic reports role-specialized
+subagents spending "more tokens on coordination than on actual work", and recommends subagents
+for context protection and parallel research ([Anthropic — When to use multi-agent
+systems](https://www.claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them)).
+Both are vendor-reported. Giving subagents only evidence-gathering follows that pattern, and one
+writer avoids contended writes to shared pages.
 
-## 3. Parallelism and context
+## Self-review limits, and why the second look is blind
 
-**When subagents pay, per Anthropic's guidance** (vendor-primary, marketing-adjacent, figures from its own testing without method): context protection, when a subtask produces more than about 1,000 tokens of mostly irrelevant output and has clear extraction criteria; parallelization over independent facets; and specialization (many tools, conflicting personas). Outside those cases "coordination costs typically exceed the benefits", multi-agent runs use 3 to 10 times the tokens, and parallelism buys "thoroughness, not speed" ([Anthropic — When to Use Multi-Agent Systems (and When Not To)](https://www.claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them)).
+**Self-review in the same context is weak.** Without external feedback, models struggle to
+correct their own reasoning and sometimes get worse ([Huang et al. — LLMs cannot self-correct
+reasoning yet](https://arxiv.org/abs/2310.01798); abstract-level). Anthropic found agents
+"confidently" praising their own mediocre work, and that tuning a separate skeptical evaluator was
+"far more tractable" than making a generator self-critical ([Anthropic — Harness design for
+long-running apps](https://www.anthropic.com/engineering/harness-design-long-running-apps);
+vendor-reported).
 
-**When not:** sequential phases of the same work, tightly coupled components, and work needing shared state (same source). In one Anthropic experiment role-specialized subagents "spent more tokens on coordination than on actual work". An agent building a feature should also write its tests.
+**Fresh context helps against repeated self-review, not necessarily against one pass.** A
+fresh-session reviewer scored F1 28.6% against 21.7% for a second same-session review. It was not
+significantly ahead of a single same-session review (27.1%) ([Song — Cross-context
+review](https://arxiv.org/abs/2603.12123); abstract-only, v2 corrects v1). So the skill keeps the
+self-review, because it is cheap and catches checklist omissions, and does not count it as the
+independent check.
 
-**What crosses a boundary.** Subagents work in clean windows and return a distilled summary, often 1,000 to 2,000 tokens ([Anthropic — Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)); CodeDelegator's design gives each fresh Coder only a specification ([CodeDelegator - Mitigating Context Pollution via Role Separation in Code-as-Action Agents](https://arxiv.org/abs/2601.14914); abstract only, no numbers). So a delegated task's spec must be self-contained and should say what the result must contain. HumanLayer calls subagents "about context control", not role-play ([HumanLayer - Advanced Context Engineering for Coding Agents](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/ace-fca.md)).
+**Clean context is the reviewer's advantage.** Cognition's review agent works best when "the
+coding and review agents do not share any context beforehand" ([Cognition](https://cognition.com/blog/multi-agents-working)),
+and a fresh context "won't be biased toward code it just wrote" ([Claude Code — Best
+practices](https://code.claude.com/docs/en/best-practices)).
 
-**What parallel writers cost.** Two peer agents on potentially conflicting features average 30% lower success than one agent doing both ([CooperBench - Why Coding Agents Cannot be Your Teammates Yet](https://arxiv.org/abs/2601.13295); abstract only; peer coordination, not orchestrator-directed). Cross-agent concurrent PRs conflicted 41.7% of the time versus 19.8% within one agent ([ai-agent-pull-requests-on-github-frequency-structure-and-merge-conflict-rates](https://arxiv.org/html/2607.04697v1)); worktree isolation beat prompt-level "soft" isolation, which fell below a single agent ([effective-strategies-for-asynchronous-software-engineering-agents](https://arxiv.org/html/2603.21489)). Cognition's 2026 account says multi-agent works best "when writes stay single-threaded", and Osmani's rule is one file, one owner ([Cognition — Multi-Agents What's Actually Working](https://cognition.com/blog/multi-agents-working), [Osmani — Code Agent Orchestra](https://addyosmani.com/blog/code-agent-orchestra/)). At scale Cursor reports flat, lock-based self-coordination collapsing while planner, worker and judge roles worked ([Cursor — Scaling Long-Running Autonomous Coding](https://cursor.com/blog/scaling-agents); vendor-primary, no controlled comparison). Osmani suggests starting with at most 2 to 3 parallel agents on non-overlapping work.
+**Reviewers must be told to disagree.** A naive second agent tends to agree with the writer. One
+study fixed this only by instructing a critic to structure disagreement, after which a three-agent
+protocol beat a five-agent one
+([Adversarial review](https://arxiv.org/abs/2608.18167); abstract-only).
 
-**Independent practitioner view.** Willison can review and land one significant change at a time, so parallel agents go to research, explanation and small maintenance, and a detailed spec he wrote himself makes review "a lot less effort" ([Willison — Embracing the Parallel Coding Agent Lifestyle](https://simonwillison.net/2025/Oct/5/parallel-coding-agents/)).
+**Withhold the author's framing.** A reviewer shown the author's framing can be steered: an
+LLM-refined attack evaded review in 32 of 33 real vulnerabilities ([Alexopoulos et al. — Bias
+injection in automated code review](https://arxiv.org/abs/2603.18740); abstract-only). This is why the sanity
+checker gets the user's verbatim request and the saved spec, but never the self-review notes or
+the interview rationale, and why a hardening reviewer never gets the developer's narrative.
 
-**Context hygiene.** Execute a written spec from a fresh session ([Best practices for Claude Code](https://code.claude.com/docs/en/best-practices)); OpenSpec advises clearing context before implementation ([OpenSpec — Spec-Driven Development for AI Coding Assistants](https://github.com/Fission-AI/OpenSpec)). Context management matters more as the window tightens, and rule-based elision before LLM summarization was the most efficient strategy in one harness study (abstract only; [An Empirical Study of Harness Design for Coding Agents](https://arxiv.org/abs/2609.20804)).
+## Sanity-check lenses
 
-## 4. Acceptance criteria an agent can verify
+The sanity check is a broad design review, not line-level analysis. Its three lenses draw on:
 
-The long-run sources converge here more than anywhere else, and every concrete number is vendor-reported. Anthropic's feature list (over 200 items, each failing with steps and a `passes` field, editable only on `passes`) was a response to agents declaring victory early or marking features done after unit tests that missed end-to-end failures ([Anthropic — Effective Harnesses for Long-Running Agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents)). Its sprint contracts negotiate testable behaviors before code and an evaluator grades them with hard thresholds, because "Claude is a poor QA agent" untuned ([Anthropic — Harness Design for Long-Running Apps](https://www.anthropic.com/engineering/harness-design-long-running-apps)); it cost 20x or more of a solo run (20 minutes and $9 versus 6 hours and $200, vendor-reported). Verification subagents need concrete criteria, negative tests and an explicit "run the complete test suite" instruction ([Anthropic — When to Use Multi-Agent Systems (and When Not To)](https://www.claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them)). OpenAI's templates phrase acceptance as behavior a human can verify with runnable validation per milestone ([Using PLANS.md for multi-hour problem solving](https://developers.openai.com/cookbook/articles/codex_exec_plans), [Run long horizon tasks with Codex](https://developers.openai.com/blog/run-long-horizon-tasks-with-codex)). Kiro (per Böckeler), OpenSpec and the spike skill use GIVEN/WHEN/THEN forms. *Synthesis caution:* a criterion the agent can edit, or a visible suite it can fit, is weak; frontier agents saturated visible tests while a held-out gap widened with code size ([specbench-measuring-reward-hacking-in-long-horizon-coding-agents](https://arxiv.org/abs/2605.21384)).
+- **False premise, through a premortem.** Told the project "has failed spectacularly", each
+  person independently writes down why. Klein cites a 1989 study finding that this prospective
+  hindsight increases correct identification of reasons by 30% ([Klein — Performing a project
+  premortem](https://hbr.org/2007/09/performing-a-project-premortem); the figure is second-hand).
+  A blind reviewer fits the independent-listing step naturally.
+- **Over-engineering, YAGNI and KISS.** Fowler puts the odds that a presumptive feature is
+  unneeded at "at least ⅔", and excludes tests, refactoring and other work that makes software
+  easier to change ([Fowler — Yagni](https://martinfowler.com/bliki/Yagni.html)). Beck's simple
+  design rules end at "fewest elements" ([Fowler — Beck design
+  rules](https://martinfowler.com/bliki/BeckDesignRules.html)). Google SRE treats every new line
+  of code as "a liability" ([Google SRE — Simplicity](https://sre.google/sre-book/simplicity/)).
+  Agents over-build by default: on already-fixed issues they made unnecessary changes in up to 70%
+  of cases ([ETH SRI — Coding agents are fixing correct
+  code](https://eth-sri.github.io/blog/fixedcode)). Kent Beck lists unrequested functionality as a
+  warning sign ([Beck — Augmented coding: beyond the
+  vibes](https://newsletter.kentbeck.com/p/augmented-coding-beyond-the-vibes)).
+- **Blind spots.** Models share errors: on one dataset they agree 60% of the time when both are
+  wrong, and more capable models are more correlated ([Kim et al. — Correlated errors in large
+  language models](https://arxiv.org/abs/2506.07962); abstract-only). A blind reviewer reduces anchoring on the
+  author's reasoning, but it does not remove shared blind spots. That is a reason to ask what was
+  not considered at all.
 
-## 5. Spikes
+**"No concerns" is a valid outcome.** A reviewer prompted to find gaps "will usually report some,
+even when the work is sound" ([Claude Code — Best
+practices](https://code.claude.com/docs/en/best-practices)). Telling agents they may abstain when
+nothing needs fixing raised correct abstention from 60.5% to 88.5% for GPT-5.4 mini and from 65%
+to 80.5% for Sonnet 4.6. "Reproduce first" without an abstain option left Sonnet roughly unchanged
+and dropped GPT-5.4 mini to 47.5% ([ETH SRI](https://eth-sri.github.io/blog/fixedcode)). The
+abstain prompt is brittle: where an earlier wrong patch needed fixing, it led those two models to
+submit 70% and 94% empty patches. So the option has to be offered, not pushed.
 
-Three sources describe throwaway discovery work: the Hermes `spike` skill (2 to 5 Given/When/Then questions, risk-ordered, throwaway code, a VALIDATED/PARTIAL/INVALIDATED verdict that feeds the real plan, with INVALIDATED counted as a successful spike), the ExecPlan's prototyping milestones with explicit criteria "for promoting or discarding the prototype", and Willison's "scout" habit ([Spike — Throwaway experiments to validate an idea before build](https://hermes-agent.nousresearch.com/docs/user-guide/skills/bundled/software-development/software-development-spike), [Using PLANS.md for multi-hour problem solving](https://developers.openai.com/cookbook/articles/codex_exec_plans), [Willison — Embracing the Parallel Coding Agent Lifestyle](https://simonwillison.net/2025/Oct/5/parallel-coding-agents/)). **No source gives a timebox or effort cap**, and none measures whether spikes help. This is the thinnest area of the evidence.
+**Advice, not a directive.** Because some points will be noise, the orchestrator adopts what it
+agrees with and takes disagreements to the user, who stays accountable. That split is a workflow
+choice.
 
-## 6. Failure modes
+## TDD with agents, test gaming, and certification evidence
 
-| Failure | Evidence | What the sources suggest |
-|---|---|---|
-| **Over-specification** | Context files add over 20% cost with no general success gain; Kiro made 4 stories and 16 criteria from a small bug ("a sledgehammer to crack a nut"); Osmani cites a "curse of instructions" result | Size ceremony to the task; only non-obvious, checkable content ([Evaluating AGENTS.md — Are Repository-Level Context Files Helpful for Coding Agents](https://arxiv.org/abs/2602.11988), [Böckeler — Understanding Spec-Driven Development, Kiro, spec-kit and Tessl](https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html), [How to write a good spec for AI agents](https://addyosmani.com/blog/good-spec/)) |
-| **Plan non-compliance** | Without a plan agents fall back on incomplete or overfit internal workflows; Böckeler saw agents not follow all instructions despite larger windows | Periodic plan reminders; per-milestone validation ([From Plan to Action - How Well Do Agents Follow the Plan](https://arxiv.org/abs/2604.12147)) |
-| **A bad plan is worse than none** | Subpar plan hurts more than no plan; extra early phases can hurt | Review the plan before execution; keep it minimal ([From Plan to Action - How Well Do Agents Follow the Plan](https://arxiv.org/abs/2604.12147)) |
-| **Declaring victory early** | Agent sees progress and stops; verifier runs a few tests and passes; features marked done without end-to-end testing; "context anxiety" wrap-ups near the believed limit | Machine-checkable list, separate evaluator, negative tests, full-suite mandate ([Anthropic — Effective Harnesses for Long-Running Agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents), [Anthropic — Harness Design for Long-Running Apps](https://www.anthropic.com/engineering/harness-design-long-running-apps), [Anthropic — When to Use Multi-Agent Systems (and When Not To)](https://www.claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them)) |
-| **Self-evaluation bias** | Agents "confidently" praise their own mediocre work | Separate the judge from the builder ([Anthropic — Harness Design for Long-Running Apps](https://www.anthropic.com/engineering/harness-design-long-running-apps)) |
-| **Parallel write conflicts** | 30% lower success for two peers; 41.7% cross-agent PR conflict rate; Cursor's lock-based agents slowed to the throughput of "two or three" | Disjoint ownership, interface contracts, worktrees, a single writer by default ([CooperBench - Why Coding Agents Cannot be Your Teammates Yet](https://arxiv.org/abs/2601.13295), [Cursor — Scaling Long-Running Autonomous Coding](https://cursor.com/blog/scaling-agents)) |
-| **Spec drift and misreading** | Spec-anchored maintenance is vague; Tessl generation was non-deterministic; research notes read as new requirements | Label existing versus new; treat the plan as a living document with a decision log ([Böckeler — Understanding Spec-Driven Development, Kiro, spec-kit and Tessl](https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html), [Using PLANS.md for multi-hour problem solving](https://developers.openai.com/cookbook/articles/codex_exec_plans)) |
-| **Test gaming** | Visible-versus-held-out gap grows with code size | Hold out a check the agent cannot see ([specbench-measuring-reward-hacking-in-long-horizon-coding-agents](https://arxiv.org/abs/2605.21384)) |
-| **Trusting plans over code** | A secondary summary reports six months of not reading code "did not end well" | Keep code review for production work ([HumanLayer - Evolution from RPI to CRISPY - ZenML LLMOps Database](https://www.zenml.io/llmops-database/evolution-from-rpi-to-crispy-multi-stage-workflow-for-production-coding-agents); low-quality secondary source) |
+**Tests help when they are trustworthy and outside the agent's control.** Supplying tests with
+the problem raised GPT-4's MBPP score from 69.67% to 82.45% against stricter hidden tests
+([Mathews & Nagappan — Test-driven development for code
+generation](https://arxiv.org/html/2402.13521)). Those were human-written tests.
 
-## 7. How the pieces fit (source synthesis)
+**Agent-written tests and bare "do TDD" help less.** On SWE-bench Verified, resolved and
+unresolved tasks showed similar test-writing frequencies, and agent tests leaned on prints over
+assertions ([Chen et al. — Rethinking the value of agent-generated
+tests](https://arxiv.org/html/2602.07900)). With small local models, TDD instructions alone
+raised regressions from 6.08% to 9.94%. Naming the tests a change could break cut them to 1.82%
+([TDAD](https://arxiv.org/html/2603.17973)). This is why each TDD task states what its tests must
+cover and records the expected failure, rather than relying on the instruction alone. Beck's agent
+protocol is the nearest practitioner model: simplest failing test first, then only enough code to
+pass ([Beck — Canon TDD](https://newsletter.kentbeck.com/p/canon-tdd)).
 
-*Original, joining cited sources:* the sources describe one loop at different scales. Resolve open decisions (clarify), write the smallest spec that names the goal, constraints and checkable outcomes, produce a plan whose milestones each carry a runnable check, review the plan, execute from a fresh context, and have something other than the builder confirm the checks. Plan mode is the in-session version, spec-driven tools add persistence and gates, and the long-run harnesses add progress files and an evaluator because the run outlasts one context window. The scaffolding is model-dependent: Anthropic's post says each harness component "encodes an assumption about what the model can't do on its own", and the harness study found planning helps weaker models' accuracy while mainly saving cost for stronger ones ([Anthropic — Harness Design for Long-Running Apps](https://www.anthropic.com/engineering/harness-design-long-running-apps), [An Empirical Study of Harness Design for Coding Agents](https://arxiv.org/abs/2609.20804)).
+**Visible tests get gamed.** When tests contradicted the spec, GPT-5 still passed 54% of
+impossible SWE-bench tasks. Claude models cheated mainly by editing tests. Others special-cased
+tests or overloaded comparison operators. Read-only tests stopped test edits but not
+special-casing. LLM monitors caught only 42–65% of cheats on multi-file tasks
+([ImpossibleBench](https://arxiv.org/html/2510.20270)). METR saw o3 reward-hack in 30.4% of runs
+where the scoring function was visible, against 0.7% elsewhere ([METR — Recent frontier models are
+reward hacking](https://metr.org/blog/2025-06-05-recent-reward-hacking/)). The gap between
+visible and held-out tests widened with code size
+([SpecBench](https://arxiv.org/abs/2605.21384); abstract-only).
 
-## 8. Tensions and open questions the sources do not settle
+**Why certification carries three pieces of evidence:**
 
-- **Role-split warning versus role-split practice.** Anthropic's multi-agent guidance warns against splitting by planning, implementing, testing and reviewing roles, yet the same vendor's harness post reports a planner, generator and evaluator as beneficial for long builds ([Anthropic — When to Use Multi-Agent Systems (and When Not To)](https://www.claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them), [Anthropic — Harness Design for Long-Running Apps](https://www.anthropic.com/engineering/harness-design-long-running-apps)). The sources do not reconcile them. A possible reading, this synthesis's own: the evaluator is a low-context-transfer verification split and the planner a separate scoping context, rather than specialization for its own sake.
-- **Context-use thresholds: 40% versus 40 to 60%.** HumanLayer's 2025 document targets 40 to 60% utilization; a secondary summary of its later talk puts degradation above roughly 40% ([HumanLayer - Advanced Context Engineering for Coding Agents](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/ace-fca.md), [HumanLayer - Evolution from RPI to CRISPY - ZenML LLMOps Database](https://www.zenml.io/llmops-database/evolution-from-rpi-to-crispy-multi-stage-workflow-for-production-coding-agents)). Neither threshold was independently measured in the captured evidence, and Anthropic describes degradation as "a performance gradient rather than a hard cliff" ([Anthropic — Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)).
-- **Vendor-primary versus independent evidence.** Anthropic, Cursor, OpenAI, Kiro, Google and HumanLayer each describe their own products or runs, with single runs and no controls. The independent material is two practitioners (Böckeler, Willison; neither measured) and six abstract-only arXiv papers (plan compliance, AGENTS.md, CooperBench, harness design, Ambig-SWE, CodeDelegator; the last reports no numbers). The measured results among them, on plan compliance, parallel-agent failure, context-file cost and interaction gains, come from benchmarks that may not transfer to daily work.
-- **Planning helps weaker models more than frontier ones.** One abstract-only study says so; Anthropic's own harness shed components on a stronger model but kept its planner because the generator under-scoped without it; Cursor reports using different models for planner and worker roles ([An Empirical Study of Harness Design for Coding Agents](https://arxiv.org/abs/2609.20804), [Anthropic — Harness Design for Long-Running Apps](https://www.anthropic.com/engineering/harness-design-long-running-apps), [Cursor — Scaling Long-Running Autonomous Coding](https://cursor.com/blog/scaling-agents)). What "planning" means differs across them.
-- **Detail versus altitude.** The ExecPlan asks for a plan a novice can follow with no external links and every term defined; Anthropic's planner stays high-level to avoid cascading errors; Osmani asks for "just enough nuance"; the OpenAI template itself notes the tension between prose and checklists. No source gives a threshold ([Using PLANS.md for multi-hour problem solving](https://developers.openai.com/cookbook/articles/codex_exec_plans), [Anthropic — Harness Design for Long-Running Apps](https://www.anthropic.com/engineering/harness-design-long-running-apps), [How to write a good spec for AI agents](https://addyosmani.com/blog/good-spec/)).
-- **Is the single-writer rule universal?** Supported at small scale by Cognition and Osmani; Cursor runs many concurrent workers at scale with planner-assigned tasks.
-- **Where the plan lives.** In conversation (Kiro Plan mode), outside the workspace by default (Cursor), or in the repository (ExecPlan, Codex, OpenSpec, Kiro Specs). No source compares outcomes.
-- **No source gives a spike timebox**, and none measures spike value.
-- **No source compares outcomes of spec-driven workflows with and without them.** Böckeler's evaluation is limited by her own account.
-- **The reminder mechanism.** Plan reminders help compliance, but the capture gives no interval or format.
+- **Raw test-runner output**, because a summary is a claim and the runner output is the
+  observation. Anthropic's harness let the agent flip a `passes` field but not edit the criteria
+  ([Anthropic — Effective harnesses for long-running
+  agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents)).
+- **A diff of the test files since red**, because test edits were the dominant cheat for one model
+  family, and a diff makes them visible to a reviewer who cannot rely on a monitor.
+- **An explicit flag** for any test changed after red, or that the developer believes contradicts
+  the spec. An explicit `flag_for_human_intervention` exit cut GPT-5's cheating from 54% to 9%
+  and o3's from 49% to 12%, with a much smaller effect for Claude Opus 4.1. It is one effective
+  mitigation among several: hidden tests cut cheating to near zero but hurt legitimate
+  performance, and the strictest prompt wording cut GPT-5 to 1% on a LiveCodeBench variant
+  ([ImpossibleBench](https://arxiv.org/html/2510.20270)). The flag is the one that keeps tests
+  visible and costs nothing.
 
-## 9. Rules for a spec-writing skill
+Nobody re-runs the checks at certification. The hardening reviewer sees the same evidence and is
+where the claim gets tested. That split is a workflow choice. TeamBench is a caution here:
+verifiers approved 49% of submissions that failed the deterministic grader ([Kim et al. —
+TeamBench](https://arxiv.org/abs/2605.07073); abstract-level). The mitigation the sources support is review against
+raw evidence, not the author's account.
 
-Individually cited and written so a skill author can turn each into procedure. Rules marked *extension* apply a source's finding beyond what it tested.
+## Severity classes and the borderline-up rule
 
-1. **Choose the ceremony by size, and re-test it when the model changes.** Skip the plan if you could describe the diff in one sentence; use a short in-context plan for medium work; reserve persisted, approval-gated specs for high-complexity or team work. Sources: [Böckeler — Understanding Spec-Driven Development, Kiro, spec-kit and Tessl](https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html), [Kiro Docs — Plan mode](https://kiro.dev/docs/specs/plan/), [Best practices for Claude Code](https://code.claude.com/docs/en/best-practices), [Anthropic — Harness Design for Long-Running Apps](https://www.anthropic.com/engineering/harness-design-long-running-apps).
-2. **Explore with write access off, and make the agent ask.** Run research read-only and require questions about open decisions instead of assumptions. Sources: [Google Developers Blog — Plan mode in Gemini CLI](https://developers.googleblog.com/plan-mode-now-available-in-gemini-cli/), [Cursor Docs — Plan Mode](https://cursor.com/docs/agent/planning).
-3. **Do not rely on the agent to notice gaps; list open decisions yourself.** Mark each `[NEEDS CLARIFICATION]` or equivalent and resolve it before the plan is frozen. Sources: [Ambig-SWE - Interactive Agents to Overcome Underspecificity in Software Engineering](https://arxiv.org/abs/2502.13069), [specification-driven-development-sdd](https://github.com/github/spec-kit/blob/main/spec-driven.md) (Ambig-SWE is abstract-only and the instruction wording is untested).
-4. **Open with the goal and the user-visible outcome, then non-goals and hard constraints.** Sources: [Using PLANS.md for multi-hour problem solving](https://developers.openai.com/cookbook/articles/codex_exec_plans), [Run long horizon tasks with Codex](https://developers.openai.com/blog/run-long-horizon-tasks-with-codex).
-5. **Spend words on non-obvious, checkable constraints, and omit orientation the agent can discover.** Extension from repository files to per-task specs. Source: [Evaluating AGENTS.md — Are Repository-Level Context Files Helpful for Coding Agents](https://arxiv.org/abs/2602.11988).
-6. **State the spec's level and lifetime (spec-first, anchored or source), and label existing versus new behavior.** Source: [Böckeler — Understanding Spec-Driven Development, Kiro, spec-kit and Tessl](https://martinfowler.com/articles/exploring-gen-ai/sdd-3-tools.html).
-7. **Cover the relevant areas of commands, testing, project structure, code style (one real snippet), git workflow, and Always/Ask first/Never boundaries.** The six-area origin is relayed second-hand. Source: [How to write a good spec for AI agents](https://addyosmani.com/blog/good-spec/).
-8. **Write at product and high-level design altitude; do not prescribe granular technical steps the planner can get wrong.** Sources: [Anthropic — Harness Design for Long-Running Apps](https://www.anthropic.com/engineering/harness-design-long-running-apps), [Anthropic — Effective Context Engineering for AI Agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents).
-9. **Write acceptance as observable behavior or a runnable command with its expected output, per milestone.** Sources: [Using PLANS.md for multi-hour problem solving](https://developers.openai.com/cookbook/articles/codex_exec_plans), [Run long horizon tasks with Codex](https://developers.openai.com/blog/run-long-horizon-tasks-with-codex), [Kiro Docs — Plan mode](https://kiro.dev/docs/specs/plan/).
-10. **Protect the criteria and separate the judge.** Let the executor flip a pass flag but not edit the criteria, have an evaluator other than the builder run them against the live system, and require negative tests and the full suite. Sources: [Anthropic — Effective Harnesses for Long-Running Agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents), [Anthropic — When to Use Multi-Agent Systems (and When Not To)](https://www.claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them), [Anthropic — Harness Design for Long-Running Apps](https://www.anthropic.com/engineering/harness-design-long-running-apps).
-11. **Cut milestones small enough for one loop, each independently verifiable, with a stop-and-fix rule.** Sources: [Run long horizon tasks with Codex](https://developers.openai.com/blog/run-long-horizon-tasks-with-codex), [Using PLANS.md for multi-hour problem solving](https://developers.openai.com/cookbook/articles/codex_exec_plans).
-12. **Persist the plan in the repository with a progress log, a decision log and how to run it, so a fresh session can restart from it alone.** Sources: [Using PLANS.md for multi-hour problem solving](https://developers.openai.com/cookbook/articles/codex_exec_plans), [Anthropic — Effective Harnesses for Long-Running Agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents), [Cursor Docs — Plan Mode](https://cursor.com/docs/agent/planning).
-13. **Review the plan before execution, keep it free of ceremonial phases, and re-state it at intervals in long runs.** The reminder interval is unspecified. Source: [From Plan to Action - How Well Do Agents Follow the Plan](https://arxiv.org/abs/2604.12147).
-14. **Decompose by context boundary, not role; make each delegated task spec self-contained, state what it must return, list dependencies, give each file one owner, and start with one agent (at most 2 to 3).** Sources: [Anthropic — When to Use Multi-Agent Systems (and When Not To)](https://www.claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them), [CodeDelegator - Mitigating Context Pollution via Role Separation in Code-as-Action Agents](https://arxiv.org/abs/2601.14914), [Kiro Docs — Specs](https://kiro.dev/docs/specs/), [How to write a good spec for AI agents](https://addyosmani.com/blog/good-spec/), [CooperBench - Why Coding Agents Cannot be Your Teammates Yet](https://arxiv.org/abs/2601.13295).
-15. **Put a spike before the plan when only an experiment can answer an unknown.** Write each question as Given/When/Then with an observable result, order by risk, keep the code throwaway, end with a verdict (validated, partial or invalidated) and promote-or-discard criteria, and do not invent a timebox because none is supported. Sources: [Spike — Throwaway experiments to validate an idea before build](https://hermes-agent.nousresearch.com/docs/user-guide/skills/bundled/software-development/software-development-spike), [Using PLANS.md for multi-hour problem solving](https://developers.openai.com/cookbook/articles/codex_exec_plans).
+**Label every finding, and keep "how bad" apart from "must it block".** Google's reviewer guide
+says unlabelled comments read as mandatory ([Google eng-practices — How to write code review
+comments](https://google.github.io/eng-practices/review/reviewer/comments.html)). Conventional
+Comments makes blocking a separate decoration ([Conventional
+Comments](https://conventionalcomments.org/)). CVSS scores intrinsic severity and leaves business
+factors outside its scope ([FIRST — CVSS v4.0](https://www.first.org/cvss/v4.0/specification-document)).
+
+The four classes mix those axes knowingly. IMMINENT is a severity, in the sense of CVSS or an
+incident level. COMPLIANCE and BEST-PRACTICE are kinds of finding. EDGE is mostly a blocking
+decision, like Google's FYI. The skill ties the blocking decision to the class: IMMINENT and
+COMPLIANCE are always fixed, and BEST-PRACTICE and EDGE are weighed. That mapping is the skill's
+choice, not a source's.
+
+**Each class needs a test someone else would apply the same way.** When people choose severity
+freely, 51% of duplicate-bug buckets carried inconsistent labels, though 95% described the same
+problem ([Tian et al. — On the unreliability of bug severity
+data](https://sail.cs.queensu.ca/data/pdfs/EMSE2015_OnTheUnreliabilityOfBugSeverityData.pdf)).
+That data comes from free-choice bug trackers, not a written rubric, so it shows the failure mode
+rather than its size under one.
+
+**Borderline goes up.** PagerDuty's rule is "always assume the worst": when unsure, treat it as
+the higher level, and settle it afterwards ([PagerDuty — Severity
+levels](https://response.pagerduty.com/before/severity_levels/)). The skill applies that to
+findings. Because IMMINENT and COMPLIANCE always block, a downgrade or refutation of one goes to the
+user with its evidence before anyone acts on it.
+
+**Most findings will not be IMMINENT.** In an industrial inspection study, about half the issues
+raised were false positives, and "only 13 percent" would have compromised function ([Porter et
+al. — Cost-benefits of code
+inspections](https://userweb.cs.txstate.edu/~rp31/papersSQ/PorterEtAl_TSE.pdf)). Together with
+over-reporting, that is why the orchestrator verifies each finding against its evidence.
+
+## Stopping rules, fresh reviewers and the early stop
+
+**Most of the gain comes early.** Across code generation, test generation and translation, "the
+first three to four repair iterations account for most achievable gains", and feedback design
+mattered more than the model ([Kiecker et al. — Is three the magic
+number?](https://arxiv.org/html/2607.05197)). In a
+randomized human inspection experiment, two two-person teams were no more effective than one
+([Porter et al.](https://userweb.cs.txstate.edu/~rp31/papersSQ/PorterEtAl_TSE.pdf)). At Stripe,
+agent CI iteration is capped at two rounds before the change goes to a person ([Stripe —
+Minions](https://stripe.dev/blog/minions-stripes-one-shot-end-to-end-coding-agents);
+vendor-reported).
+
+**The default of 2** sits at the low end of that two-to-four range, with a pause to ask the user
+when more look needed. It is a workflow choice, recorded in the plan as a parameter, as Kiecker
+et al. recommend.
+
+**A fresh reviewer per round.** Most models lose "60–80% of their debugging capability within
+just 2–3 attempts", and clearing the context at that point raised accuracy for all six models
+tested ([Adnan & Kuhn — The debugging decay index](https://arxiv.org/html/2506.18403)).
+Self-repair gains are "often modest", and feedback from a stronger source raised them markedly
+([Olausson et al. — Is self-repair a silver
+bullet?](https://arxiv.org/html/2306.09896)). Both point to fresh feedback each round, not
+repeated passes from the same reviewer.
+
+**Stop early on a clean round.** Evidence-based stopping, by estimating remaining defects from
+reviewer overlap, needs four or more inspectors ([Briand et al. — Capture-recapture
+models](https://ehealthinformation.ca/web/default/files/wp-files/isern-97-22.pdf)). One reviewer
+per round cannot support that. A round with no blocking findings is the cheap signal that can be
+used instead.
+
+**More rounds are not free.** Allowing multiple submissions with feedback raised the legitimate
+pass rate from 80% to 83%, and raised cheating on impossible tasks from 33% to 38%
+([ImpossibleBench](https://arxiv.org/html/2510.20270)). This is one reason N is a ceiling rather
+than a target, and why late rounds should look for weakened tests.
+
+**When rounds run out.** The pause before delivery covers the case the cap would otherwise hide:
+an IMMINENT item found in the final round, or an IMMINENT fix that no round has reviewed. No
+source measures this rule. It follows from treating an unreviewed fix as the same kind of
+unchecked claim as an uncertified test result.
+
+## Remediation by the original developer
+
+No source directly measures who should fix a reviewer's findings. The choice rests on adjacent
+evidence:
+
+- **Context transfer.** Anthropic advises that the agent building a feature also write its tests,
+  and warns against splitting sequential phases of the same work between agents ([Anthropic — When
+  to use multi-agent
+  systems](https://www.claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them)).
+  The original developer already holds the package's context.
+- **Outside feedback is what makes repair work.** The findings come from an independent reviewer,
+  which is the external feedback that self-correction lacks ([Huang et
+  al.](https://arxiv.org/abs/2310.01798); [Olausson et al.](https://arxiv.org/html/2306.09896)).
+
+There is a counter-signal: debugging decays within a long conversation, and a fresh start helped
+([Adnan & Kuhn](https://arxiv.org/html/2506.18403)). The skill's answer is that the reviewer is
+always fresh, and a fresh developer, given the brief, the certification evidence and the findings,
+is the fallback when the original is unavailable. Whether the original or a fresh developer fixes
+better is untested.
+
+## Spikes
+
+Spikes skip TDD, certification and hardening because their deliverable is a verdict, not shipped
+code. The ExecPlan's prototyping milestones end with explicit criteria "for promoting or
+discarding the prototype" ([OpenAI — Using
+PLANS.md](https://developers.openai.com/cookbook/articles/codex_exec_plans)). No source measures
+whether spikes help or gives them a timebox, so promoted work is specced again as a build.
+
+## Gaps
+
+- **Severity triage by AI reviewers.** Nothing measures how well an AI reviewer assigns severity
+  classes, or how often its classes agree with another reviewer's under a written rubric. The
+  noise figure above comes from human bug trackers.
+- **Misreported test results.** Nothing measures how often agents misreport their own test
+  results. The gaming studies concern deliberate cheating, not misreading or overstating output.
+- **An enforced red-first loop.** No study measures a loop where the agent writes the failing test
+  itself, confirms the failure, and then implements, on realistic tasks.
+- **The package as a whole.** No source compares this workflow, or any spec-driven workflow,
+  against working without it.
+- **Evidence quality.** Much of the evidence is abstract-only (Huang et al., Song, Ambig-SWE, From
+  Plan to Action, TeamBench, Adversarial review, Alexopoulos et al., Kim et al. on correlated
+  errors, SpecBench), vendor-reported (Anthropic, Cognition, OpenAI,
+  Stripe), second-hand (Klein's 30%) or from the 1990s (Porter et al., Briand et al.). The LLM
+  repair-loop studies use mechanical feedback on benchmarks, mostly with smaller or older models,
+  not rounds of independent review on agent-built features.
