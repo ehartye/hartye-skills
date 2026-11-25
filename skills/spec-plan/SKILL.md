@@ -165,6 +165,12 @@ are saved outside Plan mode.
      - **Dev:** make them pass, then refactor while they stay green.
      - **Certification:** the developer self-certifies that all relevant tests pass and that its
        assigned acceptance criteria are met.
+   - **Tell the developer, in its brief, to deliver the best solution it can with the information
+     in the spec.** Where the spec is thin, it chooses within the package's scope and carries on;
+     it stops only when it cannot proceed within the spec's decisions and its authorization.
+   - **Ask in the same brief for hardening feedback**, returned to you as its own list, apart from
+     the certification evidence: weak spots, gaps in the spec, choices it made for itself, and
+     risks out of its scope. Each item gives a location and the risk. "None" is valid.
    - Relevant tests are the project's full test command where one exists, otherwise the package's
      new tests plus its acceptance commands.
 5. **Define the certification evidence.**
@@ -178,8 +184,10 @@ are saved outside Plan mode.
    [hardening contract](#hardening-contract) below.
    - Record N and place up to N rounds after all of that spec's development packages are
      certified and before its delivery package.
-   - When N is 0, plan no rounds, and state in the plan and in the handoff: "No independent review
-     of the self-certified work will happen."
+   - State that the developers' feedback seeds the rounds.
+   - When N is 0, plan no rounds, plan a step before delivery in which you log every feedback item
+     to the wiki backlog, and state in the plan and in the handoff: "No independent review of the
+     self-certified work will happen."
 8. **Plan delegation and delivery.**
    - Default to a subagent per package, running independent packages in parallel with
      self-contained briefs and concise reports of changed files, checks and blockers.
@@ -211,8 +219,21 @@ and not an earlier round's reviewer.
 
 - Give it the spec, its acceptance criteria, the stated project and quality rules, the resulting
   artifacts and diff, and the certification evidence.
+- Give it the developers' hardening feedback as leads, under Developer feedback below.
 - Never give it the developers' narrative conclusions.
 - It returns findings, each with a class, evidence and a location. "No findings" is a valid result.
+
+**Developer feedback.** Enter each item in the hardening log as a lead when it arrives.
+
+- **Seed the next round with it.** Give the reviewer each lead's location and risk, without the
+  developer's reasoning or reassurance. Say that the leads are places to look, not the scope and
+  not findings.
+- After the round, give every lead a disposition. One the reviewer confirms is a finding and takes
+  a class; record the rest as checked or still open.
+- **Log what no round will check.** When N is 0, when hardening has stopped, or when a lead is
+  still open after the last round, the orchestrator logs each item to the project's wiki backlog
+  through wiki-master:wiki-project before delivery, and the delivery report links it. Log every
+  item, including those the developer thinks are settled.
 
 **Classes.** A borderline finding, or one the reviewer labels with two classes, takes the higher.
 
