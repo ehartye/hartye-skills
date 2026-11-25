@@ -9,16 +9,19 @@ Each asking agent is a fresh, tool-less session with no user or project instruct
 question tool's schema, the skill text and one conversation below, as the assistant in that
 conversation. It replies with any text it would show first, then the exact tool payload.
 
-Each payload is then read by two fresh graders that never see the skill or which version produced it:
+Each payload is then read by three fresh graders that never see the skill or which version produced it:
 
 - **Cold reader.** Gets only the project blurb and what the dialog shows (header, question, option
-  labels and descriptions). It never sees the conversation or text shown before the dialog. It restates
-  each decision, what each option causes and why the recommendation is recommended, then quotes every
-  reference it could not resolve.
+  labels and descriptions). It never sees the conversation or text shown before the dialog.
 - **Fidelity checker.** Gets the conversation and the payload. It quotes every claim in the payload that
   the conversation does not support.
+- **Explainable-reference judge.** Gets the conversation, the payload and the cold reader's list, and
+  marks which unresolved references the conversation could have explained.
 
-Both graders and the expectations were fixed before the first run.
+The first two graders, M1 to M4 and expectations E1 to E8 were fixed before the first run. The third
+grader, E9 and M5 came after the first baseline and before any edit. M6 came after the first edit and M7
+after the second. Every scenario ran against the old text as well as the new. The grader prompts are at
+the end of this file.
 
 ## M1
 
@@ -158,3 +161,51 @@ Added after the second edit: M1 again, with a question tool whose options carry 
 | E7 | M1, M2, M4, M5, M6, M7 | Every pending item is in the set; the sender name (M1, M4), group bookings (M5) and prices (M6) are not asked again |
 | E8 | M3 | One line, no questions |
 | E9 | M1, M2, M4, M5, M6, M7 | No reference the cold reader left unresolved is one the conversation could have explained. Added after the first baseline, before any edit. A third blind grader judges the cold reader's list against the conversation |
+
+## Grader prompts
+
+Verbatim, with the filled-in parts in angle brackets. The list of already-answered items in the fidelity
+prompt named only the sender name for the first M1, M2 and M4 runs, and grew with M5 and M6.
+
+Cold reader:
+
+```text
+You are a member of the team on this project. You know what the project is and its goal, as follows:
+<blurb>
+
+You have been working on something else and have no memory of the recent session with the coding agent. The agent now shows you this, and nothing else:
+<dialog>
+<payload>
+</dialog>
+
+You must use only what is above. For each question, in order, work out: what is being decided; what each option will concretely cause; and why the recommended option is recommended. Do not guess charitably: if you are inferring something the text does not tell you, say so. List, quoted verbatim, every term, name or reference you cannot resolve from the text. Mark one "blocking" if you would have to ask the agent about it, or scroll back, before you could choose with confidence; otherwise "minor". Ordinary technical vocabulary is fine.
+Reply with one JSON object only: {"questions":[{"topic":str,"decision_clear":bool,"options_clear":bool,"recommendation_reason_clear":bool,"could_answer_confidently":bool,"unresolved":[{"quote":str,"level":"blocking"|"minor","why":str}]}]}
+```
+
+Fidelity checker:
+
+```text
+Below is a session and the questions an agent then asked the user about it. Check only fidelity. Quote every statement in the questions, stated as fact, that the session does not support (invented behavior, numbers, causes, consequences). Reasonable inferences that are marked as inference, and ordinary technical consequences that clearly follow, are fine. Also list which pending items from the session are asked about, and whether anything the user already answered in the session (the text-message sender name, how group bookings are handled, whether prices are included) is asked about again.
+Project: <blurb>
+<session>
+<conversation></session>
+<questions>
+<payload>
+</questions>
+Reply with one JSON object only: {"unsupported":[{"quote":str,"why":str}],"items_asked":[str],"settled_asked":bool}
+```
+
+Explainable-reference judge:
+
+```text
+Below is a session, the questions an agent asked about it, and a list of references a cold reader said the questions left unresolved. For each listed item decide whether the SESSION contains the information that would resolve it (so the agent could have explained it and did not). Information the session never states does not count.
+<session>
+<conversation></session>
+<questions>
+<payload>
+</questions>
+<unresolved>
+<cold reader's numbered list>
+</unresolved>
+Reply with one JSON object only: {"items":[{"n":int,"session_explains":bool,"where":str}]}
+```
