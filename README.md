@@ -55,6 +55,12 @@ Wiki-backed skills target wiki-master 0.89.0 or later and its six-role catalog.
 
 ## Version notes
 
+### 0.13.2
+
+ask-me now writes each question for a reader with no memory of the session: the situation, what every
+name refers to and what each option does are explained in full. Questions are about twice as long. See
+the [validation record](docs/testing/ask-me-cold-reader-results.md), including its limits.
+
 ### 0.13.1
 
 Python 3.14 is the only supported version for yoda's bundled scanner, and its CI runs on 3.14. The

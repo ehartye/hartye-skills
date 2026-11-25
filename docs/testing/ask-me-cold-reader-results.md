@@ -65,5 +65,5 @@ against explaining more, so both were replaced.
 - M5 and E9 were added after the first baseline, M6 after the first edit, and M7 after the second. All
   ran against the old text as well as the new.
 - The scenarios and the edit have the same author. The graders are models.
-- Payloads were written out, not sent to a live dialog. How long question text looks in a real dialog is
-  unverified. No Codex host was used.
+- Payloads were written out, not sent to a live dialog. One live question of about 200 words, with three
+  long option descriptions, was shown and answered in Claude Code; how it looked was not reported. No Codex host was used.
