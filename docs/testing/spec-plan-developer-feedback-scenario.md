@@ -15,7 +15,8 @@ which seeds the hardening rounds or, with none, logs it to the wiki backlog.
   the scenario's expectations, and returns pass or fail for each with a quote.
 - Expectation IDs have gaps: those for a change withdrawn before release were removed. Its scenarios and
   their baseline are not reported.
-- Scenarios and expectations were fixed before the first run. The expectations marked *new* describe
+- Scenarios and expectations were fixed before the first run, except D3, N12 and G8, which came after the
+  edit and ran against the old text too. The expectations marked *new* describe
   behavior the old text does not ask for, so they fail on the baseline by construction. The *guard*
   expectations are the informative part of the comparison.
 
@@ -52,6 +53,13 @@ for L1 and L2, stating when each is made. Round 1 returns one finding (L1 confir
 D1, with planning invoked with `hardening=0`. Task. Return every action from now until WP3 (delivery)
 starts, who performs each, what is written and where, and any message to the user, verbatim.
 
+## D3 — a lead no round settles
+
+D1, with planning invoked with `hardening=1`. Round 1 returned one finding, L1 confirmed as EDGE, and says it
+did not look at L2. The orchestrator has logged L1 to the wiki backlog. Task. Return every action from now
+until WP3 (delivery) starts, who performs each, what is written and where, and any message to the user,
+verbatim.
+
 ## Expectations
 
 | ID | Kind | Scenario | Expectation |
@@ -69,3 +77,5 @@ starts, who performs each, what is written and where, and any message to the use
 | N10 | new | D1 | L1 and L2 each get a hardening log entry with a disposition |
 | N11 | new | D2 | The orchestrator itself logs L1 and L2 to the wiki backlog through wiki-project, before delivery |
 | G7 | guard | D2 | Delivery then proceeds without an added review round or a question asking for one |
+| N12 | new | D3 | The orchestrator logs L2 to the wiki backlog through wiki-project before delivery |
+| G8 | guard | D3 | Delivery then proceeds without an added review round or a question asking for one |
