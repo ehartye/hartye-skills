@@ -18,6 +18,7 @@ these as a package:
 - the orchestrator writing every spec itself;
 - a self-review followed by a blind sanity check from a fresh agent;
 - the TDD → dev → certification triple for every development task;
+- developers' feedback seeding the hardening rounds, or logged when there are none;
 - a default of 2 hardening rounds;
 - the four finding classes (IMMINENT, COMPLIANCE, BEST-PRACTICE, EDGE);
 - the stopping rule.
@@ -97,7 +98,9 @@ protocol beat a five-agent one
 LLM-refined attack evaded review in 32 of 33 real vulnerabilities ([Alexopoulos et al. — Bias
 injection in automated code review](https://arxiv.org/abs/2603.18740); abstract-only). This is why the sanity
 checker gets the user's verbatim request and the saved spec, but never the self-review notes or
-the interview rationale, and why a hardening reviewer never gets the developer's narrative.
+the interview rationale, and why a hardening reviewer never gets the developer's narrative. Developer feedback reaches it
+only as leads, a location and a risk without the developer's reasoning, so it can look there
+without being steered to a verdict. No source tests that form; it is a workflow choice.
 
 ## Sanity-check lenses
 
