@@ -6,8 +6,8 @@ when_to_use: Use when the user says "ask me", "what do you need from me", "I hav
 
 # Ask Me
 
-The user has a moment. Spend it on the questions that unblock the most work, asked so each one
-can be answered in a few seconds.
+The user has a moment. Spend it on the questions that unblock the most work, each explained fully
+enough to answer without scrolling back or asking you what it means.
 
 ## 1. Gather
 
@@ -22,22 +22,40 @@ If nothing is waiting, say so in one line and stop. Do not invent questions to f
 
 ## 2. Ask
 
+**Assume the user has no context from this session.** Write for someone who knows the project and
+its goals but is coming in cold: switching over from other work, back after a break, or never
+having read what you did. Having agreed to something earlier does not mean they remember it. Skip
+explaining the project; explain the situation in full, and when unsure, explain more.
+
 Use a structured-question tool available in the current mode. Put related items in the same
 batch, up to four questions or fewer if the tool requires it. Obey its option limits too. Keep
 the complete pending set when it needs several batches. In Codex, read
 [question controls and waiting](references/codex.md) before choosing the tool. For each question:
 
-- Put the context in the question itself: what you were doing, what stopped you, and what you did
-  in the meantime, so the user does not have to scroll back.
-- Offer two to four options within the tool's limits, each with its trade-off in a few words.
-- Put the option you recommend first and mark it as recommended.
+- Put the whole explanation in the question itself, since text shown before the dialog may not be
+  seen: what you were doing, what you found, why it needs the user, and what you did in the
+  meantime. Each question stands alone, so repeat what it shares with another. If the user agreed
+  to something or was told something earlier, restate it.
+- Say what each thing is before relying on its name: labels you coined, numbered steps and runs,
+  files, tests, tickets, people, and what each number counts and compares with. Describe it or drop
+  the name.
+- Offer two to four options within the tool's limits. In each description, say what you will do if
+  it is chosen, what then changes and for whom, and the known trade-off. Keep headers and labels
+  within the tool's length limits, counting the characters; the explanation goes in the question
+  and the descriptions.
+- Put the option you recommend first, mark it as recommended, and give the reason and the evidence
+  behind it.
+- Fuller does not mean filled in. State as fact only what you did, read or were told; mark what
+  you worked out as your inference; say what you have not checked. Leave out a motive, cost or
+  effect you would have to make up.
 
 When several choices may apply, use native multi-select if supported. Otherwise explain the
 limit and ask for all chosen option labels in free text. If the tool cannot accept that answer,
 use plain text. Do not force a multiple-answer question into a single-choice control.
 
 With no suitable structured-question tool, use the same shape in plain text: numbered questions,
-lettered options, the recommendation first and marked, in batches of up to four.
+lettered options, the recommendation first and marked, explained just as fully, in batches of up
+to four.
 
 ## 3. Wait for submission
 

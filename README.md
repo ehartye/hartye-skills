@@ -42,7 +42,7 @@ Wiki-backed skills target wiki-master 0.89.0 or later and its six-role catalog.
 
 | Skill | Use when |
 | ----- | -------- |
-| [ask-me](skills/ask-me/SKILL.md) | You are offering a free moment, or want the agent to ask you what it is waiting on. Groups pending decisions with context and recommendations, waits for each submitted answer, and supports multiple selections through native controls or text. |
+| [ask-me](skills/ask-me/SKILL.md) | You are offering a free moment, or want the agent to ask you what it is waiting on. Groups pending decisions, explains each one in full for a reader with no memory of the session, gives recommendations, waits for each submitted answer, and supports multiple selections through native controls or text. |
 | [beautiful](skills/beautiful/SKILL.md) | Building or reshaping any user-facing interface, or a design reads as templated and AI-generated. Covers aesthetic direction, typography, palette, layout, motion, and interface copy. |
 | [brief-me](skills/brief-me/SKILL.md) | You want a brief on a request before anything happens. Reports only what is already in context, keeping facts, inferences, general background and unknowns apart, then offers a follow-up research request. |
 | [challenge](skills/challenge/SKILL.md) | You want an idea, concept or course of action sanity checked: are we thinking about this right, and what are we missing? Gives a verdict, where "it holds up" is a complete answer, and offers a blind evaluation from a fresh subagent. |
