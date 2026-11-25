@@ -55,6 +55,13 @@ Wiki-backed skills target wiki-master 0.89.0 or later and its six-role catalog.
 
 ## Version notes
 
+### 0.14.0
+
+spec-plan's developer briefs now ask for the best solution the spec supports and for hardening
+feedback. The feedback seeds the hardening rounds, or goes to the wiki backlog when no round will check
+it, as with `hardening=0`. See the
+[validation record](docs/testing/spec-plan-developer-feedback-results.md).
+
 ### 0.13.2
 
 ask-me now writes each question for a reader with no memory of the session: the situation, what every
